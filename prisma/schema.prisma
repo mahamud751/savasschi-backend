@@ -9,7 +9,7 @@ datasource db {
 
 model User {
   id            String       @id @default(uuid())
-  name          String
+  name          String?
   email         String       @unique
   phone         String?
   referralCode  String?
@@ -18,6 +18,8 @@ model User {
   address       String?
   role          UserRole     @default(user)
   branchId      String?
+  departmentId  String?
+  categoryId    String?
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   photos        Json[]       @default([])
@@ -57,11 +59,13 @@ model User {
   policyAccepted       Boolean?     @default(false)
   ndaAccepted          Boolean?     @default(false)
   
-  branch        Branch?      @relation(fields: [branchId], references: [id], onDelete: SetNull)
-  advances      Advance[]    @relation("VendorAdvances")
-  orders        Order[]      @relation("RiderOrders")
-  permissions   Permission[] @relation("UserPermissions")
-  accounts      Account[]    @relation("UserAccounts") // Relation name defined
+  branch        Branch?            @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  department    Department?        @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  category      EmployeeCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  advances      Advance[]          @relation("VendorAdvances")
+  orders        Order[]            @relation("RiderOrders")
+  permissions   Permission[]       @relation("UserPermissions")
+  accounts      Account[]          @relation("UserAccounts") // Relation name defined
 
   @@index([email])
 }
@@ -538,12 +542,16 @@ enum UserRole {
   schoolManager
   rider
   b2bManager
+  franchise
+  employee
+  client
 }
 
 enum UserStatus {
   active
   deactive
   blocked
+  pending
 }
 
 enum VendorStatus {
@@ -572,4 +580,34 @@ enum VendorStatus {
 enum CancelStatus {
   YES
   NO
+}
+
+model Department {
+  id          String   @id @default(uuid())
+  name        String
+  head        String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  status      String   @default("active")
+  users       User[]
+}
+
+model EmployeeCategory {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  status      String   @default("active")
+  users       User[]
+}
+
+model CompanyCategory {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  status      String   @default("active")
 }

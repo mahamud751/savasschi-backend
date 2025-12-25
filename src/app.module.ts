@@ -32,6 +32,9 @@ import { SubOrderModule } from './subOrder/sub-order.module';
 import { BusinessBannerModule } from './businessBanner/business-banner.module';
 import { PaymentPercentModule } from './paymentPercent/payment-percent.module';
 import { ShippingModule } from './shipping/shipping.module';
+import { DepartmentModule } from './department/department.module';
+import { EmployeeCategoryModule } from './employeeCategory/employee-category.module';
+import { CompanyCategoryModule } from './companyCategory/company-category.module';
 
 @Module({
   providers: [SocketService],
@@ -67,6 +70,9 @@ import { ShippingModule } from './shipping/shipping.module';
     BusinessBannerModule,
     PaymentPercentModule,
     ShippingModule,
+    DepartmentModule,
+    EmployeeCategoryModule,
+    CompanyCategoryModule,
 
     // MessagesModule,
   ],

@@ -33,6 +33,16 @@ export class UpdateUserDto {
   @IsString()
   phone?: string;
 
+  @ApiPropertyOptional({ description: 'The business name' })
+  @IsOptional()
+  @IsString()
+  businessName?: string;
+
+  @ApiPropertyOptional({ description: 'The business address' })
+  @IsOptional()
+  @IsString()
+  businessAddress?: string;
+
   @ApiProperty({
     description: 'The role of the user',
     enum: UserRole,

@@ -16,10 +16,10 @@ import { UserRole, UserStatus } from '@prisma/client';
 import { IsBangladeshPhoneNumber } from './phone-number-validation';
 
 export class CreateUserDto {
-  @ApiProperty({ description: 'The name of the user' })
-  @IsNotEmpty()
+  @ApiPropertyOptional({ description: 'The name of the user' })
+  @IsOptional()
   @IsString()
-  name: string;
+  name?: string;
 
   @ApiProperty({ description: 'The email of the user' })
   @IsNotEmpty()
@@ -63,6 +63,16 @@ export class CreateUserDto {
   @IsString()
   @IsOptional()
   branch?: string;
+
+  @ApiPropertyOptional({ description: 'The department of the user' })
+  @IsString()
+  @IsOptional()
+  departmentId?: string;
+
+  @ApiPropertyOptional({ description: 'The category of the user' })
+  @IsString()
+  @IsOptional()
+  categoryId?: string;
 
   @ApiPropertyOptional({
     description: 'The status of the user',

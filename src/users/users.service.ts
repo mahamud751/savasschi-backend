@@ -35,6 +35,8 @@ export class UsersService {
       password,
       role,
       branch,
+      departmentId,
+      categoryId,
       photos,
       provider,
       providerId,
@@ -82,10 +84,22 @@ export class UsersService {
       throw new BadRequestException('User with email already exists');
     }
 
-    let hashedPassword: string | undefined;
-    if (password) {
-      hashedPassword = await bcrypt.hash(password, 10);
+    // Auto-assign password for employees and franchises
+    let passwordToUse = password;
+    if (!password && (role === 'user' || !role)) {
+      passwordToUse = '123456Aa';
     }
+
+    let hashedPassword: string | undefined;
+    if (passwordToUse) {
+      hashedPassword = await bcrypt.hash(passwordToUse, 10);
+    }
+
+    // Set initial status to 'pending' for employee, franchise, and client
+    const initialStatus =
+      role === 'employee' || role === 'franchise' || role === 'client'
+        ? 'pending'
+        : 'active';
 
     const existingUserWithRole = await this.prisma.user.findFirst({
       where: { role: (role as UserRole) || 'user' },
@@ -104,10 +118,12 @@ export class UsersService {
         role: (role as UserRole) || 'user',
         password: hashedPassword,
         branchId: branch,
+        departmentId,
+        categoryId,
         photos: photoObjects,
         provider,
         providerId,
-        status: 'active',
+        status: initialStatus,
         nationalId,
         dateOfBirth,
         businessName,
@@ -186,6 +202,12 @@ export class UsersService {
     if (user.status === 'blocked' || user.status === 'deactive') {
       throw new UnauthorizedException(
         'User is blocked or deactivated and cannot log in',
+      );
+    }
+
+    if (user.status === 'pending') {
+      throw new UnauthorizedException(
+        'Your account is pending approval. Please wait for admin approval.',
       );
     }
 
@@ -417,34 +439,48 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    const { photos, name, email, address, phone, status, permissions } =
-      updateUserDto;
+    const {
+      photos,
+      name,
+      email,
+      address,
+      phone,
+      status,
+      permissions,
+      businessName,
+      businessAddress,
+      ...otherFields
+    } = updateUserDto;
 
-    // const photoObjects =
-    //   photos?.map((photo) => ({
-    //     title: photo.title,
-    //     src: photo.src,
-    //   })) || [];
+    // Build update data object with only provided fields
+    const updateData: any = {};
 
-    let permissionsData = undefined;
+    if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email;
+    if (address !== undefined) updateData.address = address;
+    if (phone !== undefined) updateData.phone = phone;
+    if (status !== undefined) updateData.status = status;
+    if (businessName !== undefined) updateData.businessName = businessName;
+    if (businessAddress !== undefined)
+      updateData.businessAddress = businessAddress;
 
+    // Add other fields that were provided
+    Object.keys(otherFields).forEach((key) => {
+      if (otherFields[key] !== undefined) {
+        updateData[key] = otherFields[key];
+      }
+    });
+
+    // Handle permissions separately
     if (permissions) {
-      permissionsData = {
+      updateData.permissions = {
         set: permissions.map((permissionId) => ({ id: permissionId })),
       };
     }
 
     const userUpdate = await this.prisma.user.update({
       where: { id },
-      data: {
-        name: name || oldUser.name,
-        email: email || oldUser.email,
-        address: address || oldUser.address,
-        phone: phone || oldUser.phone,
-        status: status || oldUser.status,
-        // photos: photoObjects.length > 0 ? photoObjects : undefined,
-        permissions: permissionsData,
-      },
+      data: updateData,
     });
 
     await this.auditLogService.log(id, 'User', 'UPDATE', oldUser, userUpdate);
