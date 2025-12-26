@@ -15,14 +15,27 @@ export class DepartmentService {
 
   async findAll(page: number = 1, perPage: number = 25) {
     const skip = (page - 1) * perPage;
-    const [data, total] = await Promise.all([
+    const [departments, total] = await Promise.all([
       this.prisma.department.findMany({
         skip,
         take: perPage,
         orderBy: { createdAt: 'desc' },
+        include: {
+          _count: {
+            select: { users: true },
+          },
+        },
       }),
       this.prisma.department.count(),
     ]);
+
+    // Map to add employeeCount field
+    const data = departments.map((dept) => ({
+      ...dept,
+      employeeCount: dept._count.users,
+      _count: undefined, // Remove _count from response
+    }));
+
     return { data, total };
   }
 
