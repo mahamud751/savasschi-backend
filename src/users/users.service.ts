@@ -86,7 +86,10 @@ export class UsersService {
 
     // Auto-assign password for employees and franchises
     let passwordToUse = password;
-    if (!password && (role === 'user' || !role)) {
+    if (
+      !password &&
+      (role === 'employee' || role === 'franchise' || role === 'user' || !role)
+    ) {
       passwordToUse = '123456Aa';
     }
 
@@ -385,6 +388,8 @@ export class UsersService {
       include: {
         advances: true,
         permissions: true,
+        department: true,
+        category: true,
       },
     });
 

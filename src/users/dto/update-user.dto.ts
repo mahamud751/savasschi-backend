@@ -18,10 +18,10 @@ export class UpdateUserDto {
   @IsString()
   name?: string;
 
-  @ApiProperty({ description: 'The email of the user' })
-  @IsNotEmpty()
+  @ApiProperty({ description: 'The email of the user', required: false })
+  @IsOptional()
   @IsEmail()
-  email: string;
+  email?: string;
 
   @ApiProperty({ description: 'The address of the user', required: false })
   @IsOptional()
@@ -79,4 +79,19 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString({ each: true })
   permissions?: string[];
+
+  @ApiPropertyOptional({ description: 'Department ID' })
+  @IsOptional()
+  @IsString()
+  departmentId?: string;
+
+  @ApiPropertyOptional({ description: 'Employee Category ID' })
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
+
+  @ApiPropertyOptional({ description: 'Employee Category ID (alias)' })
+  @IsOptional()
+  @IsString()
+  employeeCategoryId?: string;
 }
