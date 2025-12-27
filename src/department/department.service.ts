@@ -24,6 +24,7 @@ export class DepartmentService {
           _count: {
             select: { users: true },
           },
+          category: true,
         },
       }),
       this.prisma.department.count(),

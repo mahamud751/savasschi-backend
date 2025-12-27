@@ -16,4 +16,9 @@ export class CreateDepartmentDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @ApiPropertyOptional({ description: 'Company Category ID' })
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
 }

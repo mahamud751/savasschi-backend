@@ -15,14 +15,40 @@ export class CompanyCategoryService {
 
   async findAll(page: number = 1, perPage: number = 25) {
     const skip = (page - 1) * perPage;
-    const [data, total] = await Promise.all([
+    const [categories, total] = await Promise.all([
       this.prisma.companyCategory.findMany({
         skip,
         take: perPage,
         orderBy: { createdAt: 'desc' },
+        include: {
+          departments: {
+            include: {
+              _count: {
+                select: { users: true },
+              },
+            },
+          },
+        },
       }),
       this.prisma.companyCategory.count(),
     ]);
+
+    // Map to calculate department count and employee count
+    const data = categories.map((category) => {
+      const departmentCount = category.departments.length;
+      const employeeCount = category.departments.reduce(
+        (sum, dept) => sum + dept._count.users,
+        0,
+      );
+
+      return {
+        ...category,
+        departmentCount,
+        employeeCount,
+        departments: undefined, // Remove departments from response
+      };
+    });
+
     return { data, total };
   }
 

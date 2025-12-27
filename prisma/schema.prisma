@@ -583,13 +583,15 @@ enum CancelStatus {
 }
 
 model Department {
-  id          String   @id @default(uuid())
+  id          String           @id @default(uuid())
   name        String
   head        String?
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  status      String   @default("active")
+  categoryId  String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  status      String           @default("active")
+  category    CompanyCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   users       User[]
 }
 
@@ -604,10 +606,11 @@ model EmployeeCategory {
 }
 
 model CompanyCategory {
-  id          String   @id @default(uuid())
+  id          String       @id @default(uuid())
   name        String
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  status      String   @default("active")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  status      String       @default("active")
+  departments Department[]
 }
