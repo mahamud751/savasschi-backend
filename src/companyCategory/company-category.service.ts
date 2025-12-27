@@ -22,7 +22,9 @@ export class CompanyCategoryService {
         orderBy: { createdAt: 'desc' },
         include: {
           departments: {
-            include: {
+            select: {
+              id: true,
+              name: true,
               _count: {
                 select: { users: true },
               },
@@ -33,7 +35,7 @@ export class CompanyCategoryService {
       this.prisma.companyCategory.count(),
     ]);
 
-    // Map to calculate department count and employee count
+    // Map to calculate counts and include department details
     const data = categories.map((category) => {
       const departmentCount = category.departments.length;
       const employeeCount = category.departments.reduce(
@@ -41,10 +43,14 @@ export class CompanyCategoryService {
         0,
       );
 
+      // Get department names
+      const departmentNames = category.departments.map((dept) => dept.name);
+
       return {
         ...category,
         departmentCount,
         employeeCount,
+        departmentNames,
         departments: undefined, // Remove departments from response
       };
     });
