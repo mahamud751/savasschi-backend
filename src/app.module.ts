@@ -35,6 +35,7 @@ import { ShippingModule } from './shipping/shipping.module';
 import { DepartmentModule } from './department/department.module';
 import { EmployeeCategoryModule } from './employeeCategory/employee-category.module';
 import { CompanyCategoryModule } from './companyCategory/company-category.module';
+import { AgoraModule } from './agora/agora.module';
 
 @Module({
   providers: [SocketService],
@@ -73,6 +74,7 @@ import { CompanyCategoryModule } from './companyCategory/company-category.module
     DepartmentModule,
     EmployeeCategoryModule,
     CompanyCategoryModule,
+    AgoraModule,
 
     // MessagesModule,
   ],

@@ -34,6 +34,7 @@
     "@nestjs/swagger": "^7.4.0",
     "@nestjs/websockets": "^10.4.6",
     "@prisma/client": "^5.22.0",
+    "agora-access-token": "^2.0.4",
     "bcrypt": "^5.1.1",
     "buffer": "^6.0.3",
     "class-transformer": "^0.5.1",
