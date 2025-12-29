@@ -103,6 +103,19 @@ export class AgoraController {
     @Body('expirationTime') expirationTime?: number,
   ) {
     try {
+      // Validate env are set to avoid generating invalid tokens
+      if (
+        !process.env.AGORA_APP_ID ||
+        !process.env.AGORA_APP_CERTIFICATE ||
+        process.env.AGORA_APP_ID === 'YOUR_AGORA_APP_ID' ||
+        process.env.AGORA_APP_CERTIFICATE === 'YOUR_AGORA_APP_CERTIFICATE'
+      ) {
+        throw new HttpException(
+          'Agora credentials not configured on server',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+
       if (!userId) {
         throw new HttpException('User ID is required', HttpStatus.BAD_REQUEST);
       }
@@ -130,6 +143,19 @@ export class AgoraController {
     @Query('expirationTime') expirationTime?: number,
   ) {
     try {
+      // Validate env are set to avoid generating invalid tokens
+      if (
+        !process.env.AGORA_APP_ID ||
+        !process.env.AGORA_APP_CERTIFICATE ||
+        process.env.AGORA_APP_ID === 'YOUR_AGORA_APP_ID' ||
+        process.env.AGORA_APP_CERTIFICATE === 'YOUR_AGORA_APP_CERTIFICATE'
+      ) {
+        throw new HttpException(
+          'Agora credentials not configured on server',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+
       if (!userId) {
         throw new HttpException('User ID is required', HttpStatus.BAD_REQUEST);
       }

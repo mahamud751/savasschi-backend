@@ -60,10 +60,21 @@ export class AgoraService {
     expirationTimeInSeconds: number = 86400,
   ): { token: string; appId: string } {
     try {
+      if (
+        !this.appId ||
+        !this.appCertificate ||
+        this.appId === 'YOUR_AGORA_APP_ID' ||
+        this.appCertificate === 'YOUR_AGORA_APP_CERTIFICATE'
+      ) {
+        throw new Error(
+          'Agora credentials are not set. Please configure AGORA_APP_ID and AGORA_APP_CERTIFICATE environment variables.',
+        );
+      }
+
       const currentTimestamp = Math.floor(Date.now() / 1000);
       const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
 
-      // Build RTM token
+      // Build RTM token using RTM token builder for Signaling login
       const token = RtmTokenBuilder.buildToken(
         this.appId,
         this.appCertificate,
