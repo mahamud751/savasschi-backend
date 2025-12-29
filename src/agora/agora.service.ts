@@ -52,6 +52,7 @@ export class AgoraService {
 
   /**
    * Generate RTM Token for Real-Time Messaging
+   * Note: RTM 2.x uses RTC tokens, not legacy RTM tokens
    * @param userId - User ID
    * @param expirationTimeInSeconds - Token expiration time (default: 24 hours)
    */
@@ -74,12 +75,14 @@ export class AgoraService {
       const currentTimestamp = Math.floor(Date.now() / 1000);
       const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
 
-      // Build RTM token using RTM token builder for Signaling login
-      const token = RtmTokenBuilder.buildToken(
+      // RTM 2.x uses RTC token builder with userId as string
+      // Convert userId string to UID (0 for RTM login)
+      const token = RtcTokenBuilder.buildTokenWithAccount(
         this.appId,
         this.appCertificate,
+        '', // Empty channel name for RTM login
         userId,
-        RtmRole.Rtm_User,
+        RtcRole.PUBLISHER,
         privilegeExpiredTs,
       );
 
