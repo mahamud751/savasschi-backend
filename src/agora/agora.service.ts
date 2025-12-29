@@ -94,6 +94,8 @@ export class AgoraService {
 
       // Add RTM login privilege (kRtmLogin = 1000)
       // The library has a typo: priviledges
+      // Also add kJoinChannel (1) as it is often required for connection establishment
+      key.addPriviledge(priviledges.kJoinChannel, privilegeExpiredTs);
       key.addPriviledge(priviledges.kRtmLogin, privilegeExpiredTs);
 
       const token = key.build();
