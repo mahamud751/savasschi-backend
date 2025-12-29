@@ -93,7 +93,8 @@ export class AgoraService {
       );
 
       key.addPriviledge(priviledges.kJoinChannel, privilegeExpiredTs);
-      key.addPriviledge(priviledges.kRtmLogin, privilegeExpiredTs);
+      // Use 1000 for kRtmLogin (required for RTM 2.x)
+      key.addPriviledge(1000, privilegeExpiredTs);
 
       const token = key.build();
 
