@@ -6,6 +6,12 @@ import {
   RtmRole,
 } from 'agora-access-token';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const {
+  AccessToken,
+  priviledges,
+} = require('agora-access-token/src/AccessToken');
+
 @Injectable()
 export class AgoraService {
   // Get these from environment variables or config
@@ -75,16 +81,21 @@ export class AgoraService {
       const currentTimestamp = Math.floor(Date.now() / 1000);
       const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
 
-      // RTM 2.x uses RTC token builder with userId as string
-      // Convert userId string to UID (0 for RTM login)
-      const token = RtcTokenBuilder.buildTokenWithAccount(
+      // Generate RTM 2.x compatible token
+      // RTM 2.x uses RTC token structure (AccessToken)
+      // We use userId as channelName to ensure it's not empty
+      // We add both kJoinChannel and kRtmLogin to ensure compatibility
+      const key = new AccessToken(
         this.appId,
         this.appCertificate,
-        '', // Empty channel name for RTM login
-        userId,
-        RtcRole.PUBLISHER,
-        privilegeExpiredTs,
+        userId, // channelName
+        userId, // uid
       );
+
+      key.addPriviledge(priviledges.kJoinChannel, privilegeExpiredTs);
+      key.addPriviledge(priviledges.kRtmLogin, privilegeExpiredTs);
+
+      const token = key.build();
 
       return {
         token,
