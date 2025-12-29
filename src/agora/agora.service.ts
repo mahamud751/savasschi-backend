@@ -81,14 +81,22 @@ export class AgoraService {
       const currentTimestamp = Math.floor(Date.now() / 1000);
       const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
 
-      // Use RTM 1.x token builder - more stable and widely supported
-      const token = RtmTokenBuilder.buildToken(
+      // Generate RTM 2.x compatible token
+      // RTM 2.x uses RTC token structure (AccessToken)
+      // We use userId as channelName to ensure it's not empty
+      // We use userId as uid (account) to match the client's userId
+      const key = new AccessToken(
         this.appId,
         this.appCertificate,
-        userId,
-        RtmRole.Rtm_User,
-        privilegeExpiredTs,
+        userId, // channelName
+        userId, // uid (account)
       );
+
+      // Add RTM login privilege (kRtmLogin = 1000)
+      // The library has a typo: priviledges
+      key.addPriviledge(priviledges.kRtmLogin, privilegeExpiredTs);
+
+      const token = key.build();
 
       console.log(`Generated RTM token for user: ${userId}`);
 
