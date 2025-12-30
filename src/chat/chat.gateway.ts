@@ -8,8 +8,10 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Logger } from '@nestjs/common';
+import { Logger, Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
+@Injectable()
 @WebSocketGateway({
   cors: {
     origin: '*', // Configure this to your frontend URL in production
@@ -22,6 +24,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private logger = new Logger('ChatGateway');
   private connectedUsers = new Map<string, string>(); // userId -> socketId
+
+  constructor(private prisma: PrismaService) {}
 
   handleConnection(client: Socket) {
     const userId = client.handshake.query.userId as string;
@@ -52,30 +56,47 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('send_message')
-  handleMessage(
+  async handleMessage(
     @MessageBody()
     data: { to: string; message: string; from: string; timestamp: number },
     @ConnectedSocket() client: Socket,
   ) {
     this.logger.log(`Message from ${data.from} to ${data.to}: ${data.message}`);
 
-    // Get recipient's socket ID
-    const recipientSocketId = this.connectedUsers.get(data.to);
-
-    if (recipientSocketId) {
-      // Send message to specific recipient
-      this.server.to(recipientSocketId).emit('message', {
-        from: data.from,
-        message: data.message,
-        timestamp: data.timestamp,
+    try {
+      // Store message in database (always, for history)
+      await this.prisma.message.create({
+        data: {
+          senderId: data.from.toString(),
+          receiverId: data.to.toString(),
+          content: data.message,
+          createdAt: new Date(data.timestamp),
+        },
       });
 
-      // Send success acknowledgment
-      return { success: true };
-    } else {
-      this.logger.warn(`User ${data.to} is not connected`);
-      // You could store offline messages in database here
-      return { success: false, error: 'User is offline' };
+      // Get recipient's socket ID
+      const recipientSocketId = this.connectedUsers.get(data.to);
+
+      if (recipientSocketId) {
+        // User is online - deliver immediately
+        this.server.to(recipientSocketId).emit('message', {
+          from: data.from,
+          message: data.message,
+          timestamp: data.timestamp,
+        });
+        this.logger.log(`Message delivered to online user ${data.to}`);
+      } else {
+        // User is offline - message already saved to database
+        this.logger.log(
+          `User ${data.to} is offline. Message saved to database.`,
+        );
+      }
+
+      // Always return success since message is saved
+      return { success: true, stored: true };
+    } catch (error) {
+      this.logger.error('Error handling message:', error);
+      return { success: false, error: 'Failed to save message' };
     }
   }
 
