@@ -36,6 +36,7 @@ import { DepartmentModule } from './department/department.module';
 import { EmployeeCategoryModule } from './employeeCategory/employee-category.module';
 import { CompanyCategoryModule } from './companyCategory/company-category.module';
 import { AgoraModule } from './agora/agora.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   providers: [SocketService],
@@ -75,6 +76,7 @@ import { AgoraModule } from './agora/agora.module';
     EmployeeCategoryModule,
     CompanyCategoryModule,
     AgoraModule,
+    ChatModule,
 
     // MessagesModule,
   ],
