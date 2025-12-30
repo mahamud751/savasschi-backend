@@ -77,8 +77,7 @@ import { ChatModule } from './chat/chat.module';
     CompanyCategoryModule,
     AgoraModule,
     ChatModule,
-
-    // MessagesModule,
+    MessagesModule,
   ],
 })
 export class AppModule {}
