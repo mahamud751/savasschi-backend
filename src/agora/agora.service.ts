@@ -83,17 +83,19 @@ export class AgoraService {
 
       // Generate RTM 2.x compatible token
       // RTM 2.x uses RTC token structure (AccessToken)
-      // Channel name must be EMPTY for RTM login
-      // Account (uid) must be the userId string
+      // We use userId as channelName to ensure it's not empty
+      // We use userId as uid (account) to match the client's userId
       const key = new AccessToken(
         this.appId,
         this.appCertificate,
-        '', // channelName MUST be empty for RTM login
-        userId, // uid (account) - this is the userId
+        userId, // channelName
+        userId, // uid (account)
       );
 
       // Add RTM login privilege (kRtmLogin = 1000)
       // The library has a typo: priviledges
+      // Also add kJoinChannel (1) as it is often required for connection establishment
+      key.addPriviledge(priviledges.kJoinChannel, privilegeExpiredTs);
       key.addPriviledge(priviledges.kRtmLogin, privilegeExpiredTs);
 
       const token = key.build();

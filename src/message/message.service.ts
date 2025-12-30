@@ -13,10 +13,19 @@ export class MessagesService {
   }
 
   async getMessagesByUser(senderId: string, receiverId?: string) {
+    // Get messages in BOTH directions for a conversation
     return this.prisma.message.findMany({
       where: {
-        senderId,
-        receiverId,
+        OR: [
+          {
+            senderId: senderId,
+            receiverId: receiverId,
+          },
+          {
+            senderId: receiverId,
+            receiverId: senderId,
+          },
+        ],
       },
       orderBy: {
         createdAt: 'asc',
