@@ -37,6 +37,8 @@ import { EmployeeCategoryModule } from './employeeCategory/employee-category.mod
 import { CompanyCategoryModule } from './companyCategory/company-category.module';
 import { AgoraModule } from './agora/agora.module';
 import { ChatModule } from './chat/chat.module';
+import { ProjectModule } from './project/project.module';
+import { BusinessModule } from './business/business.module';
 
 @Module({
   providers: [SocketService],
@@ -78,6 +80,8 @@ import { ChatModule } from './chat/chat.module';
     AgoraModule,
     ChatModule,
     MessagesModule,
+    ProjectModule,
+    BusinessModule,
   ],
 })
 export class AppModule {}

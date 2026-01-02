@@ -614,3 +614,61 @@ model CompanyCategory {
   status      String       @default("active")
   departments Department[]
 }
+
+enum ProjectStatus {
+  pending
+  accepted
+  rejected
+  in_progress
+  completed
+  cancelled
+}
+
+enum BusinessStatus {
+  pending
+  accepted
+  rejected
+  in_progress
+  completed
+  cancelled
+}
+
+model Project {
+  id          String        @id @default(uuid())
+  userId      String
+  businessId  String?
+  clientName  String
+  projectName String
+  taskTitle   String
+  description String?
+  attachments Json[]        @default([])
+  status      ProjectStatus @default(pending)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  // Relations
+  business    Business?     @relation(fields: [businessId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([businessId])
+  @@index([status])
+}
+
+model Business {
+  id           String         @id @default(uuid())
+  userId       String
+  businessName String
+  industry     String?
+  taskTitle    String
+  description  String?
+  attachments  Json[]         @default([])
+  status       BusinessStatus @default(pending)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  
+  // Relations
+  projects     Project[]
+  
+  @@index([userId])
+  @@index([status])
+}
