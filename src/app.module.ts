@@ -39,6 +39,7 @@ import { AgoraModule } from './agora/agora.module';
 import { ChatModule } from './chat/chat.module';
 import { ProjectModule } from './project/project.module';
 import { BusinessModule } from './business/business.module';
+import { AttendanceModule } from './attendance/attendance.module';
 
 @Module({
   providers: [SocketService],
@@ -82,6 +83,7 @@ import { BusinessModule } from './business/business.module';
     MessagesModule,
     ProjectModule,
     BusinessModule,
+    AttendanceModule,
   ],
 })
 export class AppModule {}
