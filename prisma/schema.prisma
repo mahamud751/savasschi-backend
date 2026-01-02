@@ -66,6 +66,7 @@ model User {
   orders        Order[]            @relation("RiderOrders")
   permissions   Permission[]       @relation("UserPermissions")
   accounts      Account[]          @relation("UserAccounts") // Relation name defined
+  attendances   Attendance[]       @relation("UserAttendance")
 
   @@index([email])
 }
@@ -670,5 +671,31 @@ model Business {
   projects     Project[]
   
   @@index([userId])
+  @@index([status])
+}
+
+enum AttendanceStatus {
+  present
+  absent
+  late
+  on_leave
+}
+
+model Attendance {
+  id        String           @id @default(uuid())
+  userId    String
+  date      DateTime
+  checkIn   DateTime?
+  checkOut  DateTime?
+  status    AttendanceStatus @default(present)
+  notes     String?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  
+  // Relations
+  user      User             @relation("UserAttendance", fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([date])
   @@index([status])
 }
