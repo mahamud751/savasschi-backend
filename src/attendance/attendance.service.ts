@@ -31,6 +31,61 @@ export class AttendanceService {
       );
     }
 
+    // Check if attendance already exists for this user and date
+    const targetDate = new Date(date);
+    const startOfDay = new Date(targetDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(targetDate.setHours(23, 59, 59, 999));
+
+    const existingAttendance = await this.prisma.attendance.findFirst({
+      where: {
+        userId: user.id,
+        date: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      },
+    });
+
+    // If attendance exists, update it with checkout time
+    if (existingAttendance) {
+      const updateData: any = {};
+
+      // Only update checkOut if checkIn already exists (subsequent clock)
+      if (existingAttendance.checkIn && checkIn) {
+        updateData.checkOut = new Date(checkIn); // Use the new time as checkout
+      } else if (checkOut) {
+        updateData.checkOut = new Date(checkOut);
+      }
+
+      // Update status if provided
+      if (rest.status) {
+        updateData.status = rest.status;
+      }
+
+      const attendance = await this.prisma.attendance.update({
+        where: { id: existingAttendance.id },
+        data: updateData,
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              employeeId: true,
+              email: true,
+              role: true,
+              phone: true,
+            },
+          },
+        },
+      });
+
+      return {
+        message: 'Attendance updated successfully (checkout recorded)',
+        attendance,
+      };
+    }
+
+    // No existing attendance, create new record
     // Convert date strings to Date objects
     const attendanceData: any = {
       ...rest,
@@ -63,7 +118,7 @@ export class AttendanceService {
     });
 
     return {
-      message: 'Attendance created successfully',
+      message: 'Attendance created successfully (check-in recorded)',
       attendance,
     };
   }
