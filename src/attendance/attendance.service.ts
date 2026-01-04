@@ -11,11 +11,30 @@ export class AttendanceService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createAttendanceDto: CreateAttendanceDto) {
-    const { checkIn, checkOut, date, ...rest } = createAttendanceDto;
+    const { checkIn, checkOut, date, userId, ...rest } = createAttendanceDto;
+
+    // Find user by UUID or employeeId
+    let user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    // If not found by UUID, try finding by employeeId
+    if (!user) {
+      user = await this.prisma.user.findUnique({
+        where: { employeeId: userId },
+      });
+    }
+
+    if (!user) {
+      throw new NotFoundException(
+        `User not found with ID or Employee ID: ${userId}`,
+      );
+    }
 
     // Convert date strings to Date objects
     const attendanceData: any = {
       ...rest,
+      userId: user.id, // Use the actual user UUID
       date: new Date(date),
     };
 
@@ -34,6 +53,7 @@ export class AttendanceService {
           select: {
             id: true,
             name: true,
+            employeeId: true,
             email: true,
             role: true,
             phone: true,
@@ -99,6 +119,7 @@ export class AttendanceService {
             select: {
               id: true,
               name: true,
+              employeeId: true,
               email: true,
               role: true,
               phone: true,
@@ -131,6 +152,7 @@ export class AttendanceService {
           select: {
             id: true,
             name: true,
+            employeeId: true,
             email: true,
             role: true,
             phone: true,
@@ -163,6 +185,7 @@ export class AttendanceService {
           select: {
             id: true,
             name: true,
+            employeeId: true,
             email: true,
             role: true,
             phone: true,
@@ -202,6 +225,7 @@ export class AttendanceService {
           select: {
             id: true,
             name: true,
+            employeeId: true,
             email: true,
             role: true,
             phone: true,

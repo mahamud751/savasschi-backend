@@ -18,6 +18,11 @@ export class UpdateUserDto {
   @IsString()
   name?: string;
 
+  @ApiPropertyOptional({ description: 'The employee ID' })
+  @IsOptional()
+  @IsString()
+  employeeId?: string;
+
   @ApiProperty({ description: 'The email of the user', required: false })
   @IsOptional()
   @IsEmail()

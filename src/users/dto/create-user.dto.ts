@@ -21,6 +21,11 @@ export class CreateUserDto {
   @IsString()
   name?: string;
 
+  @ApiPropertyOptional({ description: 'The employee ID' })
+  @IsOptional()
+  @IsString()
+  employeeId?: string;
+
   @ApiProperty({ description: 'The email of the user' })
   @IsNotEmpty()
   @IsEmail()
