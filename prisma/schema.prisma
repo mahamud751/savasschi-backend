@@ -68,6 +68,7 @@ model User {
   permissions   Permission[]       @relation("UserPermissions")
   accounts      Account[]          @relation("UserAccounts") // Relation name defined
   attendances   Attendance[]       @relation("UserAttendance")
+  leaves        Leave[]            @relation("UserLeaves")
 
   @@index([email])
 }
@@ -682,6 +683,23 @@ enum AttendanceStatus {
   on_leave
 }
 
+enum LeaveStatus {
+  pending
+  approved
+  rejected
+  cancelled
+}
+
+enum LeaveType {
+  annual
+  sick
+  casual
+  emergency
+  unpaid
+  maternity
+  paternity
+}
+
 model Attendance {
   id        String           @id @default(uuid())
   userId    String
@@ -699,4 +717,32 @@ model Attendance {
   @@index([userId])
   @@index([date])
   @@index([status])
+}
+
+model Leave {
+  id           String      @id @default(uuid())
+  userId       String
+  leaveType    LeaveType
+  fromDate     DateTime
+  toDate       DateTime
+  totalDays    Int
+  reason       String?
+  status       LeaveStatus @default(pending)
+  attachment   String?     // URL or path to uploaded file
+  approvedBy   String?     // User ID of approver
+  approvedAt   DateTime?
+  rejectedBy   String?     // User ID of rejector
+  rejectedAt   DateTime?
+  rejectionReason String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  
+  // Relations
+  user         User        @relation("UserLeaves", fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([status])
+  @@index([leaveType])
+  @@index([fromDate])
+  @@index([toDate])
 }
