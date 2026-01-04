@@ -9,8 +9,8 @@ import {
 
 export class CreateProjectDto {
   @ApiProperty({ description: 'User ID who creates the project' })
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: 'User ID is required' })
+  @IsUUID('4', { message: 'User ID must be a valid UUID' })
   userId: string;
 
   @ApiPropertyOptional({ description: 'Business ID (optional)' })
@@ -18,13 +18,13 @@ export class CreateProjectDto {
   @IsUUID()
   businessId?: string;
 
-  @ApiProperty({ description: 'Client/Business name' })
-  @IsNotEmpty()
+  @ApiPropertyOptional({ description: 'Client/Business name (optional)' })
+  @IsOptional()
   @IsString()
-  clientName: string;
+  clientName?: string;
 
   @ApiProperty({ description: 'Project name' })
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Project name is required' })
   @IsString()
   projectName: string;
 

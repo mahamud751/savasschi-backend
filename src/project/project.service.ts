@@ -9,11 +9,33 @@ export class ProjectService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createProjectDto: CreateProjectDto) {
-    const { attachments = [], ...data } = createProjectDto;
+    const {
+      attachments = [],
+      userId,
+      businessId,
+      clientName,
+      projectName,
+      taskTitle,
+      description,
+    } = createProjectDto;
+
+    // Validate that user exists
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
 
     return this.prisma.project.create({
       data: {
-        ...data,
+        userId,
+        businessId: businessId || null,
+        clientName: clientName || '',
+        projectName,
+        taskTitle,
+        description: description || '',
         attachments: attachments as any,
       },
       include: {
