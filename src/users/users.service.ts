@@ -195,6 +195,7 @@ export class UsersService {
       include: {
         branch: true,
         permissions: true,
+        roleModel: true,
       },
     });
 
@@ -226,6 +227,7 @@ export class UsersService {
       phone: user.phone,
       address: user.address,
       role: user.role,
+      roleId: user.roleId,
       branch: user.branch,
       permissions: user.permissions.map((permission) => ({
         id: permission.id,

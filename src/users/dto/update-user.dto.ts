@@ -56,6 +56,11 @@ export class UpdateUserDto {
   @IsString()
   role?: string;
 
+  @ApiPropertyOptional({ description: 'Role ID' })
+  @IsOptional()
+  @IsString()
+  roleId?: string;
+
   @ApiProperty({
     description: 'The status of the user',
     enum: UserStatus,

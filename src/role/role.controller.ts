@@ -16,10 +16,10 @@ import {
   UpdateRoleDto,
   AssignRolePermissionsDto,
 } from './dto/role.dto';
-import { AdminLoginRoleGuard } from '../auth/AdminLoginRoleGuard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('roles')
-@UseGuards(AdminLoginRoleGuard)
+@UseGuards(JwtAuthGuard)
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
