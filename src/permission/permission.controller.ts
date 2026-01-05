@@ -116,6 +116,16 @@ export class PermissionController {
     return this.bannerService.assignRolePermissions(dto);
   }
 
+  @Get('roles')
+  @ApiOperation({ summary: 'Get all roles with their permissions' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return all roles with permissions.',
+  })
+  getAllRolesPermissions() {
+    return this.bannerService.getAllRolesPermissions();
+  }
+
   @Get('roles/:role')
   @ApiOperation({ summary: 'Get permissions for a specific role' })
   @ApiParam({ name: 'role', description: 'Role name' })
@@ -125,16 +135,6 @@ export class PermissionController {
   })
   getRolePermissions(@Param('role') role: string) {
     return this.bannerService.getRolePermissions(role);
-  }
-
-  @Get('roles')
-  @ApiOperation({ summary: 'Get all roles with their permissions' })
-  @ApiResponse({
-    status: 200,
-    description: 'Return all roles with permissions.',
-  })
-  getAllRolesPermissions() {
-    return this.bannerService.getAllRolesPermissions();
   }
 
   // User Permission Endpoints
