@@ -460,7 +460,7 @@ export class UsersService {
   async updateUser(id: string, updateUserDto: UpdateUserDto) {
     const oldUser = await this.prisma.user.findUnique({
       where: { id },
-      include: { permissions: true },
+      include: { permissions: true, roleModel: true },
     });
 
     if (!oldUser) {
@@ -475,6 +475,7 @@ export class UsersService {
       phone,
       status,
       permissions,
+      roleId,
       businessName,
       businessAddress,
       ...otherFields
@@ -491,6 +492,20 @@ export class UsersService {
     if (businessName !== undefined) updateData.businessName = businessName;
     if (businessAddress !== undefined)
       updateData.businessAddress = businessAddress;
+
+    // Handle roleId and update role field based on roleModel
+    if (roleId !== undefined) {
+      updateData.roleId = roleId;
+
+      // Fetch the role to get the role name
+      const roleModel = await this.prisma.role.findUnique({
+        where: { id: roleId },
+      });
+
+      if (roleModel) {
+        updateData.role = roleModel.name; // Update role field with role name
+      }
+    }
 
     // Add other fields that were provided
     Object.keys(otherFields).forEach((key) => {
