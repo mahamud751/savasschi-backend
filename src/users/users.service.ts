@@ -428,12 +428,33 @@ export class UsersService {
   async getUser(id: string): Promise<any> {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      include: { permissions: true },
+      include: {
+        permissions: true,
+        roleModel: true,
+        branch: true,
+      },
     });
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return user;
+
+    // Return user data in same format as login
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      address: user.address,
+      role: user.role,
+      roleId: user.roleId,
+      status: user.status,
+      branch: user.branch,
+      roleModel: user.roleModel,
+      permissions: user.permissions.map((permission) => ({
+        id: permission.id,
+        name: permission.name,
+      })),
+    };
   }
 
   async updateUser(id: string, updateUserDto: UpdateUserDto) {
