@@ -7,6 +7,11 @@ export class CreatePermissionDto {
   @IsNotEmpty()
   name: string;
 
+  @ApiPropertyOptional({ description: 'Description of the permission' })
+  @IsString()
+  @IsOptional()
+  description?: string;
+
   @ApiPropertyOptional({
     description: 'Array of user IDs associated with the permission',
     type: [String],

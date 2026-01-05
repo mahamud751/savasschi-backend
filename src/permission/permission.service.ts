@@ -7,6 +7,8 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
+import { AssignRolePermissionsDto } from './dto/role-permission.dto';
+import { AssignUserPermissionsDto } from './dto/user-permission.dto';
 import { AuditLogService } from '../audit/audit.service';
 
 @Injectable()
@@ -122,5 +124,137 @@ export class PermissionService {
     }
 
     return this.prisma.permission.delete({ where: { id } });
+  }
+
+  // Role Permission Methods
+  async assignRolePermissions(dto: AssignRolePermissionsDto) {
+    const { role, permissionIds } = dto;
+
+    // Validate permissions exist
+    const permissions = await this.prisma.permission.findMany({
+      where: { id: { in: permissionIds } },
+    });
+
+    if (permissions.length !== permissionIds.length) {
+      throw new BadRequestException('Some permission IDs are invalid');
+    }
+
+    // Delete existing role permissions
+    await this.prisma.rolePermission.deleteMany({
+      where: { role },
+    });
+
+    // Create new role permissions
+    const rolePermissions = await this.prisma.rolePermission.createMany({
+      data: permissionIds.map((permissionId) => ({
+        role,
+        permissionId,
+      })),
+    });
+
+    return {
+      message: 'Role permissions assigned successfully',
+      count: rolePermissions.count,
+    };
+  }
+
+  async getRolePermissions(role: string) {
+    const rolePermissions = await this.prisma.rolePermission.findMany({
+      where: { role },
+      include: {
+        permission: true,
+      },
+    });
+
+    return {
+      role,
+      permissions: rolePermissions.map((rp) => rp.permission),
+    };
+  }
+
+  async getAllRolesPermissions() {
+    const rolePermissions = await this.prisma.rolePermission.findMany({
+      include: {
+        permission: true,
+      },
+    });
+
+    // Group by role
+    const grouped = rolePermissions.reduce((acc, rp) => {
+      if (!acc[rp.role]) {
+        acc[rp.role] = [];
+      }
+      acc[rp.role].push(rp.permission);
+      return acc;
+    }, {});
+
+    return grouped;
+  }
+
+  // User Permission Methods
+  async assignUserPermissions(dto: AssignUserPermissionsDto) {
+    const { userId, permissionIds } = dto;
+
+    // Validate user exists
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Validate permissions exist
+    const permissions = await this.prisma.permission.findMany({
+      where: { id: { in: permissionIds } },
+    });
+
+    if (permissions.length !== permissionIds.length) {
+      throw new BadRequestException('Some permission IDs are invalid');
+    }
+
+    // Update user permissions (disconnect all, then connect new ones)
+    const updatedUser = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        permissions: {
+          set: permissionIds.map((id) => ({ id })),
+        },
+      },
+      include: {
+        permissions: true,
+      },
+    });
+
+    return {
+      message: 'User permissions assigned successfully',
+      user: {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        permissions: updatedUser.permissions,
+      },
+    };
+  }
+
+  async getUserPermissions(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        permissions: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return {
+      userId: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      permissions: user.permissions,
+    };
   }
 }

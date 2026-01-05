@@ -19,6 +19,8 @@ import {
 import { PermissionService } from './permission.service';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
+import { AssignRolePermissionsDto } from './dto/role-permission.dto';
+import { AssignUserPermissionsDto } from './dto/user-permission.dto';
 
 @ApiTags('permissions')
 @Controller('permissions')
@@ -100,5 +102,61 @@ export class PermissionController {
   @ApiResponse({ status: 404, description: 'permission not found.' })
   remove(@Param('id') id: string) {
     return this.bannerService.remove(id);
+  }
+
+  // Role Permission Endpoints
+  @Post('roles/assign')
+  @ApiOperation({ summary: 'Assign permissions to a role' })
+  @ApiBody({ type: AssignRolePermissionsDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Role permissions assigned successfully.',
+  })
+  assignRolePermissions(@Body() dto: AssignRolePermissionsDto) {
+    return this.bannerService.assignRolePermissions(dto);
+  }
+
+  @Get('roles/:role')
+  @ApiOperation({ summary: 'Get permissions for a specific role' })
+  @ApiParam({ name: 'role', description: 'Role name' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return permissions for the role.',
+  })
+  getRolePermissions(@Param('role') role: string) {
+    return this.bannerService.getRolePermissions(role);
+  }
+
+  @Get('roles')
+  @ApiOperation({ summary: 'Get all roles with their permissions' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return all roles with permissions.',
+  })
+  getAllRolesPermissions() {
+    return this.bannerService.getAllRolesPermissions();
+  }
+
+  // User Permission Endpoints
+  @Post('users/assign')
+  @ApiOperation({ summary: 'Assign permissions to a user' })
+  @ApiBody({ type: AssignUserPermissionsDto })
+  @ApiResponse({
+    status: 200,
+    description: 'User permissions assigned successfully.',
+  })
+  assignUserPermissions(@Body() dto: AssignUserPermissionsDto) {
+    return this.bannerService.assignUserPermissions(dto);
+  }
+
+  @Get('users/:userId')
+  @ApiOperation({ summary: 'Get permissions for a specific user' })
+  @ApiParam({ name: 'userId', description: 'User ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return permissions for the user.',
+  })
+  getUserPermissions(@Param('userId') userId: string) {
+    return this.bannerService.getUserPermissions(userId);
   }
 }
