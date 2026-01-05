@@ -127,68 +127,26 @@ export class PermissionService {
   }
 
   // Role Permission Methods
+  // DEPRECATED: Use RoleService.assignPermissions() instead
+  // This method is kept for backward compatibility but should not be used
   async assignRolePermissions(dto: AssignRolePermissionsDto) {
-    const { role, permissionIds } = dto;
-
-    // Validate permissions exist
-    const permissions = await this.prisma.permission.findMany({
-      where: { id: { in: permissionIds } },
-    });
-
-    if (permissions.length !== permissionIds.length) {
-      throw new BadRequestException('Some permission IDs are invalid');
-    }
-
-    // Delete existing role permissions
-    await this.prisma.rolePermission.deleteMany({
-      where: { role },
-    });
-
-    // Create new role permissions
-    const rolePermissions = await this.prisma.rolePermission.createMany({
-      data: permissionIds.map((permissionId) => ({
-        role,
-        permissionId,
-      })),
-    });
-
-    return {
-      message: 'Role permissions assigned successfully',
-      count: rolePermissions.count,
-    };
+    throw new BadRequestException(
+      'This method is deprecated. Please use /v1/roles/assign-permissions endpoint instead',
+    );
   }
 
+  // DEPRECATED: Use RoleService.findOne() instead
   async getRolePermissions(role: string) {
-    const rolePermissions = await this.prisma.rolePermission.findMany({
-      where: { role },
-      include: {
-        permission: true,
-      },
-    });
-
-    return {
-      role,
-      permissions: rolePermissions.map((rp) => rp.permission),
-    };
+    throw new BadRequestException(
+      'This method is deprecated. Please use /v1/roles/:id endpoint instead',
+    );
   }
 
+  // DEPRECATED: Use RoleService.findAll() instead
   async getAllRolesPermissions() {
-    const rolePermissions = await this.prisma.rolePermission.findMany({
-      include: {
-        permission: true,
-      },
-    });
-
-    // Group by role
-    const grouped = rolePermissions.reduce((acc, rp) => {
-      if (!acc[rp.role]) {
-        acc[rp.role] = [];
-      }
-      acc[rp.role].push(rp.permission);
-      return acc;
-    }, {});
-
-    return grouped;
+    throw new BadRequestException(
+      'This method is deprecated. Please use /v1/roles endpoint instead',
+    );
   }
 
   // User Permission Methods

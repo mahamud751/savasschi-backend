@@ -12,7 +12,7 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PhotoDto } from 'src/dto/photoDto';
 import { Type } from 'class-transformer';
-import { UserRole, UserStatus } from '@prisma/client';
+import { UserStatus } from '@prisma/client';
 import { IsBangladeshPhoneNumber } from './phone-number-validation';
 
 export class CreateUserDto {
@@ -43,11 +43,10 @@ export class CreateUserDto {
 
   @ApiPropertyOptional({
     description: 'The role of the user',
-    enum: UserRole,
   })
   @IsOptional()
-  @IsEnum(UserRole)
-  role?: UserRole;
+  @IsString()
+  role?: string;
 
   @ApiPropertyOptional({
     description: 'Array of photo objects',

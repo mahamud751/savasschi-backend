@@ -28,7 +28,7 @@ import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import Roles from '../auth/roles.decorator';
 import RolesGuard from '../auth/roles.guard';
-import { Product, UserRole } from '@prisma/client';
+import { Product } from '@prisma/client';
 import { AdminRoleGuard } from 'src/auth/AdminRoleGuard';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { multerOptions } from '../../middleware/multer.config';
@@ -140,7 +140,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'Users retrieved successfully.' })
   async getUsers(
-    @Query('role') role?: UserRole,
+    @Query('role') role?: string,
     @Query('email') email?: string,
     @Query('page') page: number = 1,
     @Query('perPage') perPage: number = 10,

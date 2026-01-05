@@ -12,7 +12,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
-import { Prisma, Product, UserRole } from '@prisma/client';
+import { Prisma, Product } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuditLogService } from 'src/audit/audit.service';
 
@@ -105,7 +105,7 @@ export class UsersService {
         : 'active';
 
     const existingUserWithRole = await this.prisma.user.findFirst({
-      where: { role: (role as UserRole) || 'user' },
+      where: { role: role || 'user' },
       include: { permissions: true },
     });
 
@@ -118,7 +118,7 @@ export class UsersService {
         address,
         email,
         phone,
-        role: (role as UserRole) || 'user',
+        role: role || 'user',
         password: hashedPassword,
         branchId: branch,
         departmentId,
@@ -360,7 +360,7 @@ export class UsersService {
   }
 
   async getUsers(
-    role?: UserRole,
+    role?: string,
     email?: string,
     page: number = 1,
     perPage: number = 25,

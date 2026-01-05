@@ -17,7 +17,8 @@ model User {
   gender        Gender       @default(Other)
   password      String?
   address       String?
-  role          UserRole     @default(user)
+  role          String       @default("user") // Changed from UserRole enum to String
+  roleId        String?      // New field to link to Role model
   branchId      String?
   departmentId  String?
   categoryId    String?
@@ -63,6 +64,7 @@ model User {
   branch        Branch?            @relation(fields: [branchId], references: [id], onDelete: SetNull)
   department    Department?        @relation(fields: [departmentId], references: [id], onDelete: SetNull)
   category      EmployeeCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  roleModel     Role?              @relation("UserRole", fields: [roleId], references: [id], onDelete: SetNull)
   advances      Advance[]          @relation("VendorAdvances")
   orders        Order[]            @relation("RiderOrders")
   permissions   Permission[]       @relation("UserPermissions")
@@ -455,6 +457,17 @@ model Notification {
   order     Order    @relation(fields: [orderId], references: [id])
 }
 
+model Role {
+  id              String           @id @default(uuid())
+  name            String           @unique
+  description     String?
+  isSystem        Boolean          @default(false) // System roles can't be deleted
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  users           User[]           @relation("UserRole")
+  rolePermissions RolePermission[]
+}
+
 model Permission {
   id              String           @id @default(uuid())
   name            String           @unique
@@ -467,14 +480,15 @@ model Permission {
 
 model RolePermission {
   id           String     @id @default(uuid())
-  role         UserRole
+  roleId       String
   permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  @@unique([role, permissionId])
-  @@index([role])
+  @@unique([roleId, permissionId])
+  @@index([roleId])
   @@index([permissionId])
 }
 

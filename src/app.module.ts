@@ -21,6 +21,7 @@ import { DynamicModule } from './dynamic/dynamic.module';
 import { ReviewModule } from './review/review.module';
 import { NotificationModule } from './notification/notification.module';
 import { PermissionModule } from './permission/permission.module';
+import { RoleModule } from './role/role.module';
 import { VariantModule } from './variants/variant.module';
 import { DiscountModule } from './discount/discount.module';
 import { SocketService } from './socket.service';
@@ -69,6 +70,7 @@ import { LeaveModule } from './leave/leave.module';
     ReviewModule,
     NotificationModule,
     PermissionModule,
+    RoleModule,
     VariantModule,
     DiscountModule,
     PriceSettingModule,

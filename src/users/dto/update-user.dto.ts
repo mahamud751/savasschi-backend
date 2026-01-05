@@ -7,7 +7,7 @@ import {
   IsArray,
   ValidateNested,
 } from 'class-validator';
-import { UserRole, UserStatus } from '@prisma/client';
+import { UserStatus } from '@prisma/client';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { PhotoDto } from 'src/dto/photoDto';
@@ -50,12 +50,11 @@ export class UpdateUserDto {
 
   @ApiProperty({
     description: 'The role of the user',
-    enum: UserRole,
     required: false,
   })
   @IsOptional()
-  @IsEnum(UserRole)
-  role?: UserRole;
+  @IsString()
+  role?: string;
 
   @ApiProperty({
     description: 'The status of the user',
