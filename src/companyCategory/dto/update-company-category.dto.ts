@@ -8,6 +8,6 @@ export class UpdateCompanyCategoryDto extends PartialType(
 ) {
   @ApiPropertyOptional({ description: 'Status of the company category' })
   @IsOptional()
-  @IsEnum(['active', 'inactive'])
+  @IsEnum(['active', 'deactive', 'blocked', 'pending'])
   status?: string;
 }

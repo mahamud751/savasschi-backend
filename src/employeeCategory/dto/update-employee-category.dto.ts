@@ -8,6 +8,6 @@ export class UpdateEmployeeCategoryDto extends PartialType(
 ) {
   @ApiPropertyOptional({ description: 'Status of the employee category' })
   @IsOptional()
-  @IsEnum(['active', 'inactive'])
+  @IsEnum(['active', 'deactive', 'blocked', 'pending'])
   status?: string;
 }

@@ -6,6 +6,6 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 export class UpdateDepartmentDto extends PartialType(CreateDepartmentDto) {
   @ApiPropertyOptional({ description: 'Status of the department' })
   @IsOptional()
-  @IsEnum(['active', 'inactive'])
+  @IsEnum(['active', 'deactive', 'blocked', 'pending'])
   status?: string;
 }
