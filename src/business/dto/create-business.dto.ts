@@ -2,10 +2,17 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsOptional, IsArray } from 'class-validator';
 
 export class CreateBusinessDto {
-  @ApiProperty({ description: 'User ID who creates the business' })
+  @ApiProperty({ description: 'User ID who owns the business (client)' })
   @IsNotEmpty()
   @IsString()
   userId: string;
+
+  @ApiProperty({
+    description: 'User ID who created the business (admin/creator)',
+  })
+  @IsNotEmpty()
+  @IsString()
+  createdBy: string;
 
   @ApiProperty({ description: 'Business name' })
   @IsNotEmpty()

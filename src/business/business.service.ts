@@ -25,6 +25,14 @@ export class BusinessService {
             role: true,
           },
         },
+        creator: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
         projects: true,
       },
     });
@@ -50,6 +58,14 @@ export class BusinessService {
         take,
         include: {
           user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              role: true,
+            },
+          },
+          creator: {
             select: {
               id: true,
               name: true,

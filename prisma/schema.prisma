@@ -72,6 +72,7 @@ model User {
   attendances   Attendance[]       @relation("UserAttendance")
   leaves        Leave[]            @relation("UserLeaves")
   businesses    Business[]         @relation("UserBusinesses")
+  createdBusinesses Business[]     @relation("CreatedBusinesses")
 
   @@index([email])
 }
@@ -690,6 +691,7 @@ model Project {
 model Business {
   id           String         @id @default(uuid())
   userId       String
+  createdBy    String
   businessName String
   industry     String?
   taskTitle    String
@@ -701,9 +703,11 @@ model Business {
   
   // Relations
   user         User           @relation("UserBusinesses", fields: [userId], references: [id], onDelete: Cascade)
+  creator      User           @relation("CreatedBusinesses", fields: [createdBy], references: [id], onDelete: Cascade)
   projects     Project[]
   
   @@index([userId])
+  @@index([createdBy])
   @@index([status])
 }
 
