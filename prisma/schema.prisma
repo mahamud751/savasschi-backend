@@ -71,6 +71,7 @@ model User {
   accounts      Account[]          @relation("UserAccounts") // Relation name defined
   attendances   Attendance[]       @relation("UserAttendance")
   leaves        Leave[]            @relation("UserLeaves")
+  businesses    Business[]         @relation("UserBusinesses")
 
   @@index([email])
 }
@@ -699,6 +700,7 @@ model Business {
   updatedAt    DateTime       @updatedAt
   
   // Relations
+  user         User           @relation("UserBusinesses", fields: [userId], references: [id], onDelete: Cascade)
   projects     Project[]
   
   @@index([userId])
