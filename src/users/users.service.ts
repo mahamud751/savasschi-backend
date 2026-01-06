@@ -176,6 +176,7 @@ export class UsersService {
       phone: user.phone,
       address: user.address,
       role: user.role,
+      employeeId: user.employeeId,
       permissions: user.permissions.map((permission) => ({
         id: permission.id,
         name: permission.name,
@@ -228,6 +229,7 @@ export class UsersService {
       address: user.address,
       role: user.role,
       roleId: user.roleId,
+      employeeId: user.employeeId,
       branch: user.branch,
       permissions: user.permissions.map((permission) => ({
         id: permission.id,
@@ -290,6 +292,7 @@ export class UsersService {
       phone: user.phone,
       address: user.address,
       role: user.role,
+      employeeId: user.employeeId,
       branch: user.branch,
       permissions: user.permissions.map((permission) => ({
         id: permission.id,
