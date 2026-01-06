@@ -64,6 +64,7 @@ export class ProjectService {
         take,
         include: {
           business: true,
+          user: true, // Include user relation to get user name
         },
         orderBy: {
           createdAt: 'desc',
@@ -88,6 +89,7 @@ export class ProjectService {
       where: { id },
       include: {
         business: true,
+        user: true, // Include user relation
       },
     });
 
@@ -103,6 +105,7 @@ export class ProjectService {
       where: { userId },
       include: {
         business: true,
+        user: true, // Include user relation
       },
       orderBy: {
         createdAt: 'desc',
@@ -115,6 +118,7 @@ export class ProjectService {
       where: { businessId },
       include: {
         business: true,
+        user: true, // Include user relation
       },
       orderBy: {
         createdAt: 'desc',
