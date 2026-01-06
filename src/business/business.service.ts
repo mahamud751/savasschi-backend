@@ -17,6 +17,14 @@ export class BusinessService {
         attachments: attachments as any,
       },
       include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
         projects: true,
       },
     });
@@ -41,6 +49,14 @@ export class BusinessService {
         skip,
         take,
         include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              role: true,
+            },
+          },
           projects: true,
         },
         orderBy: {
@@ -65,6 +81,14 @@ export class BusinessService {
     const business = await this.prisma.business.findUnique({
       where: { id },
       include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
         projects: true,
       },
     });
@@ -80,6 +104,14 @@ export class BusinessService {
     return this.prisma.business.findMany({
       where: { userId },
       include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
         projects: true,
       },
       orderBy: {
@@ -100,6 +132,14 @@ export class BusinessService {
         ...(attachments && { attachments: attachments as any }),
       },
       include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
         projects: true,
       },
     });
@@ -114,6 +154,14 @@ export class BusinessService {
         status: updateStatusDto.status as any,
       },
       include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
         projects: true,
       },
     });
