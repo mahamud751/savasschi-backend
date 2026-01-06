@@ -80,6 +80,7 @@ export class BusinessController {
   @Get()
   @ApiOperation({ summary: 'Get all businesses with filters' })
   @ApiQuery({ name: 'userId', required: false })
+  @ApiQuery({ name: 'createdBy', required: false })
   @ApiQuery({ name: 'status', required: false })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'perPage', required: false, type: Number })
@@ -89,11 +90,18 @@ export class BusinessController {
   })
   async findAll(
     @Query('userId') userId?: string,
+    @Query('createdBy') createdBy?: string,
     @Query('status') status?: string,
     @Query('page') page: number = 1,
     @Query('perPage') perPage: number = 10,
   ) {
-    return this.businessService.findAll(userId, status, page, perPage);
+    return this.businessService.findAll(
+      userId,
+      createdBy,
+      status,
+      page,
+      perPage,
+    );
   }
 
   @Get('user/:userId')

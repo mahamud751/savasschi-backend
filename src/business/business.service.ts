@@ -40,6 +40,7 @@ export class BusinessService {
 
   async findAll(
     userId?: string,
+    createdBy?: string,
     status?: string,
     page: number = 1,
     perPage: number = 10,
@@ -49,6 +50,7 @@ export class BusinessService {
 
     const where: any = {};
     if (userId) where.userId = userId;
+    if (createdBy) where.createdBy = createdBy;
     if (status) where.status = status;
 
     const [data, total] = await Promise.all([
@@ -105,6 +107,14 @@ export class BusinessService {
             role: true,
           },
         },
+        creator: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
         projects: true,
       },
     });
@@ -121,6 +131,14 @@ export class BusinessService {
       where: { userId },
       include: {
         user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
+        creator: {
           select: {
             id: true,
             name: true,
@@ -156,6 +174,14 @@ export class BusinessService {
             role: true,
           },
         },
+        creator: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
         projects: true,
       },
     });
@@ -171,6 +197,14 @@ export class BusinessService {
       },
       include: {
         user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
+        creator: {
           select: {
             id: true,
             name: true,
