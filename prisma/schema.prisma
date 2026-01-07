@@ -655,6 +655,7 @@ enum ProjectStatus {
   accepted
   rejected
   in_progress
+  modification
   completed
   cancelled
 }
@@ -664,6 +665,7 @@ enum BusinessStatus {
   accepted
   rejected
   in_progress
+  modification
   completed
   cancelled
 }

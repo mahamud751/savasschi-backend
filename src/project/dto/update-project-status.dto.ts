@@ -6,6 +6,7 @@ export enum ProjectStatus {
   ACCEPTED = 'accepted',
   REJECTED = 'rejected',
   IN_PROGRESS = 'in_progress',
+  MODIFICATION = 'modification',
   COMPLETED = 'completed',
   CANCELLED = 'cancelled',
 }
