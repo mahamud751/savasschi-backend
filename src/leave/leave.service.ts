@@ -6,10 +6,14 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateLeaveDto, LeaveType, LeaveStatus } from './dto/create-leave.dto';
 import { UpdateLeaveDto } from './dto/update-leave.dto';
+import { LeaveAllocationService } from '../leave-allocation/leave-allocation.service';
 
 @Injectable()
 export class LeaveService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private leaveAllocationService: LeaveAllocationService,
+  ) {}
 
   async create(createLeaveDto: CreateLeaveDto) {
     const { userId, fromDate, toDate, leaveType, reason, attachment } =
@@ -256,9 +260,9 @@ export class LeaveService {
   }
 
   async approve(id: string, approvedBy: string) {
-    await this.findOne(id);
+    const leave = await this.findOne(id);
 
-    return this.prisma.leave.update({
+    const updatedLeave = await this.prisma.leave.update({
       where: { id },
       data: {
         status: LeaveStatus.APPROVED,
@@ -275,12 +279,24 @@ export class LeaveService {
         },
       },
     });
+
+    // Update leave allocation when leave is approved
+    if (updatedLeave.status === LeaveStatus.APPROVED) {
+      await this.leaveAllocationService.updateUsedLeave(
+        updatedLeave.userId,
+        updatedLeave.leaveType,
+        updatedLeave.totalDays,
+        true, // Adding to used leave
+      );
+    }
+
+    return updatedLeave;
   }
 
   async reject(id: string, rejectedBy: string, rejectionReason?: string) {
-    await this.findOne(id);
+    const leave = await this.findOne(id);
 
-    return this.prisma.leave.update({
+    const updatedLeave = await this.prisma.leave.update({
       where: { id },
       data: {
         status: LeaveStatus.REJECTED,
@@ -298,17 +314,41 @@ export class LeaveService {
         },
       },
     });
+
+    // If the leave was previously approved, reduce the used leave
+    if (leave.status === LeaveStatus.APPROVED) {
+      await this.leaveAllocationService.updateUsedLeave(
+        updatedLeave.userId,
+        updatedLeave.leaveType,
+        updatedLeave.totalDays,
+        false, // Removing from used leave
+      );
+    }
+
+    return updatedLeave;
   }
 
   async cancel(id: string) {
-    await this.findOne(id);
+    const leave = await this.findOne(id);
 
-    return this.prisma.leave.update({
+    const updatedLeave = await this.prisma.leave.update({
       where: { id },
       data: {
         status: LeaveStatus.CANCELLED,
       },
     });
+
+    // If the leave was approved, reduce the used leave
+    if (leave.status === LeaveStatus.APPROVED) {
+      await this.leaveAllocationService.updateUsedLeave(
+        leave.userId,
+        leave.leaveType,
+        leave.totalDays,
+        false, // Removing from used leave
+      );
+    }
+
+    return updatedLeave;
   }
 
   async remove(id: string) {
@@ -319,6 +359,10 @@ export class LeaveService {
     });
 
     return { message: 'Leave deleted successfully' };
+  }
+
+  async getRemainingLeave(userId: string) {
+    return this.leaveAllocationService.getRemainingLeave(userId);
   }
 
   async getStats(userId?: string, startDate?: string, endDate?: string) {

@@ -22,6 +22,7 @@ model User {
   branchId      String?
   departmentId  String?
   categoryId    String?
+  leaveAllocationId String?
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   photos        Json[]       @default([])
@@ -71,6 +72,7 @@ model User {
   accounts      Account[]          @relation("UserAccounts") // Relation name defined
   attendances   Attendance[]       @relation("UserAttendance")
   leaves        Leave[]            @relation("UserLeaves")
+  leaveAllocation LeaveAllocation?
   businesses    Business[]         @relation("UserBusinesses")
   createdBusinesses Business[]     @relation("CreatedBusinesses")
   projects      Project[]          @relation("UserProjects")
@@ -784,4 +786,30 @@ model Leave {
   @@index([leaveType])
   @@index([fromDate])
   @@index([toDate])
+}
+
+model LeaveAllocation {
+  id                String    @id @default(uuid())
+  userId            String    @unique
+  annualLeave       Int       @default(14)
+  casualLeave       Int       @default(10)
+  sickLeave         Int       @default(10)
+  emergencyLeave    Int       @default(0)
+  unpaidLeave       Int       @default(0)
+  maternityLeave    Int       @default(0)
+  paternityLeave    Int       @default(0)
+  usedAnnualLeave   Int       @default(0)
+  usedCasualLeave   Int       @default(0)
+  usedSickLeave     Int       @default(0)
+  usedEmergencyLeave Int       @default(0)
+  usedUnpaidLeave   Int       @default(0)
+  usedMaternityLeave Int       @default(0)
+  usedPaternityLeave Int       @default(0)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  // Relations
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
 }

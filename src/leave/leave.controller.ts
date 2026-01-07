@@ -166,4 +166,14 @@ export class LeaveController {
   async remove(@Param('id') id: string) {
     return this.leaveService.remove(id);
   }
+
+  @Get('remaining/:userId')
+  @ApiOperation({ summary: 'Get remaining leave for a user' })
+  @ApiResponse({
+    status: 200,
+    description: 'Remaining leave retrieved successfully',
+  })
+  async getRemainingLeave(@Param('userId') userId: string) {
+    return this.leaveService.getRemainingLeave(userId);
+  }
 }
