@@ -57,7 +57,32 @@ export class AttendanceService {
         updateData.checkOut = new Date(checkOut);
       }
 
-      // Update status if provided
+      // If checkIn is being updated, check if late
+      if (checkIn && !existingAttendance.checkIn) {
+        updateData.checkIn = new Date(checkIn);
+
+        // Auto-detect if late: Check-in after 10:15 AM (Bangladesh Time)
+        const checkInTime = new Date(checkIn);
+
+        // Convert to Bangladesh time (UTC+6)
+        const bdTime = new Date(
+          checkInTime.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }),
+        );
+        const hours = bdTime.getHours();
+        const minutes = bdTime.getMinutes();
+
+        // Late threshold: 10:15 AM Bangladesh time
+        const isLate = hours > 10 || (hours === 10 && minutes > 15);
+
+        if (isLate) {
+          updateData.status = 'late';
+        } else if (existingAttendance.status === 'absent') {
+          // Change from absent to present if checking in on time
+          updateData.status = 'present';
+        }
+      }
+
+      // Update status if provided (manual override)
       if (rest.status) {
         updateData.status = rest.status;
       }
@@ -95,6 +120,25 @@ export class AttendanceService {
 
     if (checkIn) {
       attendanceData.checkIn = new Date(checkIn);
+
+      // Auto-detect if late: Check-in after 10:15 AM (Bangladesh Time)
+      const checkInTime = new Date(checkIn);
+
+      // Convert to Bangladesh time (UTC+6)
+      const bdTime = new Date(
+        checkInTime.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }),
+      );
+      const hours = bdTime.getHours();
+      const minutes = bdTime.getMinutes();
+
+      // Late threshold: 10:15 AM Bangladesh time
+      const isLate = hours > 10 || (hours === 10 && minutes > 15);
+
+      if (isLate) {
+        attendanceData.status = 'late';
+      } else if (!rest.status) {
+        attendanceData.status = 'present';
+      }
     }
 
     if (checkOut) {
