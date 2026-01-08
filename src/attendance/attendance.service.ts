@@ -53,8 +53,38 @@ export class AttendanceService {
       // Only update checkOut if checkIn already exists (subsequent clock)
       if (existingAttendance.checkIn && checkIn) {
         updateData.checkOut = new Date(checkIn); // Use the new time as checkout
+        
+        // Only update status if it's not already set or if it's 'absent'
+        // If already 'late', keep it as 'late'
+        if (!existingAttendance.status || existingAttendance.status === 'absent') {
+          const checkInTime = existingAttendance.checkIn;
+          const bdTime = new Date(
+            checkInTime.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }),
+          );
+          const hours = bdTime.getHours();
+          const minutes = bdTime.getMinutes();
+          const isLate = hours > 10 || (hours === 10 && minutes > 15);
+          
+          updateData.status = isLate ? 'late' : 'present';
+        }
+        // If status is already 'late' or 'present', keep it unchanged
       } else if (checkOut) {
         updateData.checkOut = new Date(checkOut);
+        
+        // Only update status if it's not already set or if it's 'absent'
+        // If already 'late', keep it as 'late'
+        if (existingAttendance.checkIn && (!existingAttendance.status || existingAttendance.status === 'absent')) {
+          const checkInTime = existingAttendance.checkIn;
+          const bdTime = new Date(
+            checkInTime.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }),
+          );
+          const hours = bdTime.getHours();
+          const minutes = bdTime.getMinutes();
+          const isLate = hours > 10 || (hours === 10 && minutes > 15);
+          
+          updateData.status = isLate ? 'late' : 'present';
+        }
+        // If status is already 'late' or 'present', keep it unchanged
       }
 
       // If checkIn is being updated, check if late
@@ -78,6 +108,9 @@ export class AttendanceService {
           updateData.status = 'late';
         } else if (existingAttendance.status === 'absent') {
           // Change from absent to present if checking in on time
+          updateData.status = 'present';
+        } else {
+          // Set to present if checking in on time
           updateData.status = 'present';
         }
       }

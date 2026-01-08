@@ -485,9 +485,9 @@ model Permission {
 
 model RolePermission {
   id           String     @id @default(uuid())
-  roleId       String
+  roleId       String?    // Made optional temporarily for migration
   permissionId String
-  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  role         Role?      @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
@@ -697,7 +697,7 @@ model Project {
 model Business {
   id           String         @id @default(uuid())
   userId       String
-  createdBy    String
+  createdBy    String?
   businessName String
   industry     String?
   taskTitle    String
@@ -708,8 +708,8 @@ model Business {
   updatedAt    DateTime       @updatedAt
   
   // Relations
-  user         User           @relation("UserBusinesses", fields: [userId], references: [id], onDelete: Cascade)
-  creator      User           @relation("CreatedBusinesses", fields: [createdBy], references: [id], onDelete: Cascade)
+  user         User?           @relation("UserBusinesses", fields: [userId], references: [id], onDelete: Cascade)
+  creator      User?           @relation("CreatedBusinesses", fields: [createdBy], references: [id], onDelete: Cascade)
   projects     Project[]
   
   @@index([userId])

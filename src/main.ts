@@ -30,7 +30,7 @@ async function bootstrap() {
         const formattedErrors = errors.map((error) => ({
           property: error.property,
           constraints: error.constraints,
-          children: error.children.length > 0 ? error.children : undefined,
+          children: error.children?.length > 0 ? error.children : undefined,
         }));
         return new BadRequestException({
           message: 'Validation failed',
