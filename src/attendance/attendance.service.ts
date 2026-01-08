@@ -348,11 +348,11 @@ export class AttendanceService {
 
     // Check if it's a working day (Monday-Friday, not a holiday)
     const dayOfWeek = startOfDay.getDay();
-    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6; // 0 = Sunday, 6 = Saturday
+    const isWeekend = dayOfWeek === 5 || dayOfWeek === 6; // 5 = Friday, 6 = Saturday (Your company's weekend)
 
     if (isWeekend) {
       return {
-        message: `Skipped: ${new Date(startOfDay).toLocaleDateString()} is a weekend`,
+        message: `Skipped: ${new Date(startOfDay).toLocaleDateString()} is a weekend (Friday/Saturday)`,
         date: startOfDay,
         isWeekend: true,
         absentRecordsCreated: 0,
@@ -388,6 +388,7 @@ export class AttendanceService {
         id: true,
         name: true,
         employeeId: true,
+        createdAt: true, // Get employee join date
       },
     });
 
@@ -408,8 +409,18 @@ export class AttendanceService {
       existingAttendance.map((a) => a.userId),
     );
 
-    // Find employees without attendance
-    const employeesWithoutAttendance = activeEmployees.filter(
+    // Filter employees who should have attendance for this date
+    // Only include employees who joined on or before this date
+    const eligibleEmployees = activeEmployees.filter((emp) => {
+      const joinDate = new Date(emp.createdAt);
+      joinDate.setHours(0, 0, 0, 0);
+      return joinDate <= startOfDay;
+    });
+
+    const skippedEmployees = activeEmployees.length - eligibleEmployees.length;
+
+    // Find eligible employees without attendance
+    const employeesWithoutAttendance = eligibleEmployees.filter(
       (emp) => !employeesWithAttendance.has(emp.id),
     );
 
@@ -454,7 +465,9 @@ export class AttendanceService {
         'Saturday',
       ][dayOfWeek],
       isWorkingDay: true,
-      totalEmployees: activeEmployees.length,
+      totalActiveEmployees: activeEmployees.length,
+      eligibleEmployees: eligibleEmployees.length,
+      skippedEmployees: skippedEmployees, // Employees who joined after this date
       employeesWithAttendance: employeesWithAttendance.size,
       absentRecordsCreated: absentRecords.length,
       records: absentRecords,
