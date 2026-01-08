@@ -346,6 +346,38 @@ export class AttendanceService {
     const startOfDay = new Date(targetDate.setHours(0, 0, 0, 0));
     const endOfDay = new Date(targetDate.setHours(23, 59, 59, 999));
 
+    // Check if it's a working day (Monday-Friday, not a holiday)
+    const dayOfWeek = startOfDay.getDay();
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6; // 0 = Sunday, 6 = Saturday
+
+    if (isWeekend) {
+      return {
+        message: `Skipped: ${new Date(startOfDay).toLocaleDateString()} is a weekend`,
+        date: startOfDay,
+        isWeekend: true,
+        absentRecordsCreated: 0,
+      };
+    }
+
+    // TODO: Add holiday check here if you have a holidays table
+    // const isHoliday = await this.prisma.holiday.findFirst({
+    //   where: {
+    //     date: {
+    //       gte: startOfDay,
+    //       lte: endOfDay,
+    //     },
+    //   },
+    // });
+    // if (isHoliday) {
+    //   return {
+    //     message: `Skipped: ${new Date(startOfDay).toLocaleDateString()} is a holiday`,
+    //     date: startOfDay,
+    //     isHoliday: true,
+    //     holidayName: isHoliday.name,
+    //     absentRecordsCreated: 0,
+    //   };
+    // }
+
     // Get all active employees
     const activeEmployees = await this.prisma.user.findMany({
       where: {
@@ -412,6 +444,16 @@ export class AttendanceService {
     return {
       message: `Generated ${absentRecords.length} absent records for ${new Date(startOfDay).toLocaleDateString()}`,
       date: startOfDay,
+      dayOfWeek: [
+        'Sunday',
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+      ][dayOfWeek],
+      isWorkingDay: true,
       totalEmployees: activeEmployees.length,
       employeesWithAttendance: employeesWithAttendance.size,
       absentRecordsCreated: absentRecords.length,
