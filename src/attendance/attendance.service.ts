@@ -338,4 +338,117 @@ export class AttendanceService {
       absentPercentage: total > 0 ? ((absent / total) * 100).toFixed(2) : '0',
     };
   }
+
+  // Auto-generate absent records for employees who didn't clock in
+  async generateAbsentRecords(date?: string) {
+    // Use provided date or today
+    const targetDate = date ? new Date(date) : new Date();
+    const startOfDay = new Date(targetDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(targetDate.setHours(23, 59, 59, 999));
+
+    // Get all active employees
+    const activeEmployees = await this.prisma.user.findMany({
+      where: {
+        role: 'employee',
+        status: 'active',
+      },
+      select: {
+        id: true,
+        name: true,
+        employeeId: true,
+      },
+    });
+
+    // Get existing attendance records for this date
+    const existingAttendance = await this.prisma.attendance.findMany({
+      where: {
+        date: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      },
+      select: {
+        userId: true,
+      },
+    });
+
+    const employeesWithAttendance = new Set(
+      existingAttendance.map((a) => a.userId),
+    );
+
+    // Find employees without attendance
+    const employeesWithoutAttendance = activeEmployees.filter(
+      (emp) => !employeesWithAttendance.has(emp.id),
+    );
+
+    // Create absent records for employees without attendance
+    const absentRecords = await Promise.all(
+      employeesWithoutAttendance.map((emp) =>
+        this.prisma.attendance.create({
+          data: {
+            userId: emp.id,
+            date: startOfDay,
+            status: 'absent',
+            checkIn: null,
+            checkOut: null,
+            notes: 'Auto-generated: No attendance recorded',
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                employeeId: true,
+                email: true,
+                role: true,
+                phone: true,
+              },
+            },
+          },
+        }),
+      ),
+    );
+
+    return {
+      message: `Generated ${absentRecords.length} absent records for ${new Date(startOfDay).toLocaleDateString()}`,
+      date: startOfDay,
+      totalEmployees: activeEmployees.length,
+      employeesWithAttendance: employeesWithAttendance.size,
+      absentRecordsCreated: absentRecords.length,
+      records: absentRecords,
+    };
+  }
+
+  // Generate absent records for a date range
+  async generateAbsentRecordsForRange(startDate: string, endDate: string) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const results = [];
+
+    // Loop through each day in the range
+    for (
+      let date = new Date(start);
+      date <= end;
+      date.setDate(date.getDate() + 1)
+    ) {
+      const result = await this.generateAbsentRecords(
+        date.toISOString().split('T')[0],
+      );
+      results.push(result);
+    }
+
+    const totalAbsentRecords = results.reduce(
+      (sum, r) => sum + r.absentRecordsCreated,
+      0,
+    );
+
+    return {
+      message: `Generated absent records for date range ${startDate} to ${endDate}`,
+      startDate,
+      endDate,
+      totalDays: results.length,
+      totalAbsentRecordsCreated: totalAbsentRecords,
+      dailyResults: results,
+    };
+  }
 }

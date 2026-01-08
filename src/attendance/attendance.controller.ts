@@ -132,4 +132,49 @@ export class AttendanceController {
   async remove(@Param('id') id: string) {
     return this.attendanceService.remove(id);
   }
+
+  @Post('generate-absent')
+  @ApiOperation({
+    summary: 'Generate absent records for employees who did not clock in',
+  })
+  @ApiQuery({
+    name: 'date',
+    required: false,
+    description: 'Date to generate absent records for (defaults to today)',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Absent records generated successfully',
+  })
+  async generateAbsentRecords(@Query('date') date?: string) {
+    return this.attendanceService.generateAbsentRecords(date);
+  }
+
+  @Post('generate-absent-range')
+  @ApiOperation({
+    summary: 'Generate absent records for a date range',
+  })
+  @ApiQuery({
+    name: 'startDate',
+    required: true,
+    description: 'Start date (YYYY-MM-DD)',
+  })
+  @ApiQuery({
+    name: 'endDate',
+    required: true,
+    description: 'End date (YYYY-MM-DD)',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Absent records generated successfully for date range',
+  })
+  async generateAbsentRecordsForRange(
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+  ) {
+    return this.attendanceService.generateAbsentRecordsForRange(
+      startDate,
+      endDate,
+    );
+  }
 }
