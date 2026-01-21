@@ -30,6 +30,16 @@ export class ClientBusinessService {
     }
   }
 
+  async findAll() {
+    return this.prisma.clientBusiness.findMany({
+      include: {
+        socialPosts: {
+          orderBy: { createdAt: 'desc' },
+        },
+      },
+    });
+  }
+
   async findByUserId(userId: string) {
     const clientBusiness = await this.prisma.clientBusiness.findUnique({
       where: { userId },

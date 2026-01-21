@@ -58,6 +58,12 @@ export class ClientBusinessController {
     return this.clientBusinessService.createOrUpdate(data);
   }
 
+  @Get()
+  @ApiOperation({ summary: 'Get all client businesses' })
+  async findAll() {
+    return this.clientBusinessService.findAll();
+  }
+
   @Get('user/:userId')
   @ApiOperation({ summary: 'Get client business by user ID' })
   async findByUserId(@Param('userId') userId: string) {
