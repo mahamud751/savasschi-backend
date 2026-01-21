@@ -41,6 +41,7 @@ import { AgoraModule } from './agora/agora.module';
 import { ChatModule } from './chat/chat.module';
 import { ProjectModule } from './project/project.module';
 import { BusinessModule } from './business/business.module';
+import { ClientBusinessModule } from './clientBusiness/client-business.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { LeaveModule } from './leave/leave.module';
 
@@ -88,6 +89,7 @@ import { LeaveModule } from './leave/leave.module';
     MessagesModule,
     ProjectModule,
     BusinessModule,
+    ClientBusinessModule,
     AttendanceModule,
     LeaveModule,
   ],
