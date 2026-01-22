@@ -78,6 +78,8 @@ model User {
   projects      Project[]          @relation("UserProjects")
   clientBusiness ClientBusiness?   @relation("UserClientBusiness")
   contentManagements ContentManagement[] @relation("UserContentManagements")
+  createdTasks   TaskAssignment[]   @relation("CreatedTasks")
+  assignedTasks  TaskAssignment[]   @relation("AssignedTasks")
 
   @@index([email])
 }
@@ -899,6 +901,39 @@ enum PostStatus {
   scheduled
   published
   failed
+}
+
+// ============================================
+// TASK ASSIGNMENT SYSTEM
+// ============================================
+model TaskAssignment {
+  id              String     @id @default(uuid())
+  companyId       String     // References ClientBusiness id
+  companyName     String
+  taskDescription String
+  vision          String?
+  role            String
+  assignToId      String     // User ID of assignee
+  assignToName    String     // Assignee name for display
+  assignToEmail   String     // Assignee email for notifications
+  dueDate         DateTime
+  attachments     Json[]     @default([])
+  status          String     @default("assigned") // assigned, in_progress, completed, cancelled
+  priority        String     @default("medium") // low, medium, high, urgent
+  createdBy       String     // User ID of creator
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  
+  // Relations
+  clientBusiness  ClientBusiness @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  creator         User           @relation("CreatedTasks", fields: [createdBy], references: [id], onDelete: Cascade)
+  assignee        User           @relation("AssignedTasks", fields: [assignToId], references: [id], onDelete: Cascade)
+  
+  @@index([companyId])
+  @@index([assignToId])
+  @@index([createdBy])
+  @@index([status])
+  @@index([dueDate])
 }
 
 // ============================================
