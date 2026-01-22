@@ -858,6 +858,7 @@ model ClientBusiness {
   // Relations
   user              User     @relation("UserClientBusiness", fields: [userId], references: [id], onDelete: Cascade)
   socialPosts       SocialMediaPost[]
+  taskAssignments   TaskAssignment[] @relation("ClientBusinessTasks")
   
   @@index([userId])
 }
@@ -925,7 +926,7 @@ model TaskAssignment {
   updatedAt       DateTime   @updatedAt
   
   // Relations
-  clientBusiness  ClientBusiness @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  clientBusiness  ClientBusiness @relation("ClientBusinessTasks", fields: [companyId], references: [id], onDelete: Cascade)
   creator         User           @relation("CreatedTasks", fields: [createdBy], references: [id], onDelete: Cascade)
   assignee        User           @relation("AssignedTasks", fields: [assignToId], references: [id], onDelete: Cascade)
   

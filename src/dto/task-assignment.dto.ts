@@ -66,6 +66,10 @@ export class CreateTaskAssignmentDto {
   @IsEnum(TaskPriority)
   @IsOptional()
   priority?: TaskPriority;
+
+  @IsString()
+  @IsOptional()
+  createdBy?: string;
 }
 
 export class UpdateTaskAssignmentDto {

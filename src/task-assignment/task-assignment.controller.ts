@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
   Req,
+  BadRequestException,
 } from '@nestjs/common';
 import { TaskAssignmentService } from './task-assignment.service';
 import {
@@ -18,24 +19,21 @@ import {
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('task-assignment')
-@UseGuards(JwtAuthGuard)
 export class TaskAssignmentController {
   constructor(private readonly taskAssignmentService: TaskAssignmentService) {}
 
   @Post()
   async createTask(@Body() createTaskDto: CreateTaskAssignmentDto, @Req() req) {
-    const userId = req.user.userId;
-    return this.taskAssignmentService.createTask(createTaskDto, userId);
+    // No validation - save as-is
+    return this.taskAssignmentService.createTask(createTaskDto);
   }
 
   @Get()
   async getAllTasks(
-    @Req() req,
     @Query('status') status?: string,
     @Query('companyId') companyId?: string,
   ) {
-    const userId = req.user.userId;
-    return this.taskAssignmentService.getAllTasks(userId, status, companyId);
+    return this.taskAssignmentService.getAllTasksPublic(status, companyId);
   }
 
   @Get(':id')
@@ -49,14 +47,14 @@ export class TaskAssignmentController {
     @Body() updateTaskDto: UpdateTaskAssignmentDto,
     @Req() req,
   ) {
-    const userId = req.user.userId;
-    return this.taskAssignmentService.updateTask(id, updateTaskDto, userId);
+    // No authentication required for updates
+    return this.taskAssignmentService.updateTask(id, updateTaskDto, '');
   }
 
   @Delete(':id')
   async deleteTask(@Param('id') id: string, @Req() req) {
-    const userId = req.user.userId;
-    return this.taskAssignmentService.deleteTask(id, userId);
+    // No authentication required for deletion
+    return this.taskAssignmentService.deleteTask(id, '');
   }
 
   @Get('company/:companyId')
@@ -71,13 +69,13 @@ export class TaskAssignmentController {
 
   @Get('my/created')
   async getMyCreatedTasks(@Req() req) {
-    const userId = req.user.userId;
-    return this.taskAssignmentService.getMyCreatedTasks(userId);
+    // Return empty array since no authentication
+    return [];
   }
 
   @Get('my/assigned')
   async getMyAssignedTasks(@Req() req) {
-    const userId = req.user.userId;
-    return this.taskAssignmentService.getTasksByAssignee(userId);
+    // Return empty array since no authentication
+    return [];
   }
 }

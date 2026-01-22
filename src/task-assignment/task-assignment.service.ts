@@ -15,50 +15,16 @@ import {
 export class TaskAssignmentService {
   constructor(private prisma: PrismaService) {}
 
-  async createTask(createTaskDto: CreateTaskAssignmentDto, userId: string) {
+  async createTask(createTaskDto: CreateTaskAssignmentDto) {
     try {
-      // Verify that the client business exists
-      const clientBusiness = await this.prisma.clientBusiness.findUnique({
-        where: { id: createTaskDto.companyId },
-      });
-
-      if (!clientBusiness) {
-        throw new BadRequestException('Client business not found');
-      }
-
-      // Verify that the assignee user exists
-      const assignee = await this.prisma.user.findUnique({
-        where: { id: createTaskDto.assignToId },
-      });
-
-      if (!assignee) {
-        throw new BadRequestException('Assignee user not found');
-      }
-
+      // No validation - save as-is
       const task = await this.prisma.taskAssignment.create({
         data: {
           ...createTaskDto,
           dueDate: new Date(createTaskDto.dueDate),
-          status: TaskStatus.ASSIGNED,
-          priority: createTaskDto.priority || TaskPriority.MEDIUM,
-          createdBy: userId,
-        },
-        include: {
-          clientBusiness: true,
-          creator: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-          assignee: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
+          status: 'assigned',
+          priority: createTaskDto.priority || 'medium',
+          createdBy: createTaskDto.createdBy || 'SYSTEM',
         },
       });
 
@@ -68,13 +34,15 @@ export class TaskAssignmentService {
     }
   }
 
+  async getAllTasksPublic(status?: string, companyId?: string) {
+    return this.getAllTasks(undefined, status, companyId);
+  }
+
   async getAllTasks(userId?: string, status?: string, companyId?: string) {
     try {
       const where: any = {};
 
-      if (userId) {
-        where.OR = [{ createdBy: userId }, { assignToId: userId }];
-      }
+     
 
       if (status) {
         where.status = status;
@@ -161,13 +129,7 @@ export class TaskAssignmentService {
         throw new NotFoundException('Task not found');
       }
 
-      // Check if user is authorized to update (creator or assignee)
-      if (
-        existingTask.createdBy !== userId &&
-        existingTask.assignToId !== userId
-      ) {
-        throw new BadRequestException('Not authorized to update this task');
-      }
+      // No authorization check needed
 
       const updateData: any = { ...updateTaskDto };
 
@@ -213,10 +175,7 @@ export class TaskAssignmentService {
         throw new NotFoundException('Task not found');
       }
 
-      // Only creator can delete task
-      if (task.createdBy !== userId) {
-        throw new BadRequestException('Not authorized to delete this task');
-      }
+      // No authorization check needed
 
       await this.prisma.taskAssignment.delete({
         where: { id },
