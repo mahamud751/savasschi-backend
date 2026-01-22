@@ -18,6 +18,7 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { ClientBusinessService } from './client-business.service';
+import { ClientBusinessDto } from '../dto/client-business.dto';
 import { multerOptions } from '../../middleware/multer.config';
 
 @ApiTags('client-business')
@@ -54,7 +55,7 @@ export class ClientBusinessController {
   // ============================================
   @Post()
   @ApiOperation({ summary: 'Create or update client business profile' })
-  async createOrUpdate(@Body() data: any) {
+  async createOrUpdate(@Body() data: ClientBusinessDto) {
     return this.clientBusinessService.createOrUpdate(data);
   }
 
@@ -78,7 +79,7 @@ export class ClientBusinessController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update client business' })
-  async update(@Param('id') id: string, @Body() data: any) {
+  async update(@Param('id') id: string, @Body() data: ClientBusinessDto) {
     return this.clientBusinessService.update(id, data);
   }
 
