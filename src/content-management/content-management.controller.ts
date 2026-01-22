@@ -1,0 +1,122 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import { ContentManagementService } from './content-management.service';
+import {
+  CreateContentDto,
+  UpdateContentDto,
+} from '../dto/content-management.dto';
+
+@ApiTags('content-management')
+@Controller('content-management')
+export class ContentManagementController {
+  constructor(
+    private readonly contentManagementService: ContentManagementService,
+  ) {}
+
+  // ============================================
+  // CREATE CONTENT
+  // ============================================
+  @Post()
+  @ApiOperation({ summary: 'Create new content' })
+  @ApiResponse({ status: 201, description: 'Content created successfully' })
+  async create(@Body() createContentDto: CreateContentDto) {
+    return this.contentManagementService.create(createContentDto);
+  }
+
+  // ============================================
+  // GET ALL CONTENTS
+  // ============================================
+  @Get()
+  @ApiOperation({ summary: 'Get all contents' })
+  @ApiResponse({ status: 200, description: 'Return all contents' })
+  async findAll() {
+    return this.contentManagementService.findAll();
+  }
+
+  // ============================================
+  // GET CONTENT BY USER ID
+  // ============================================
+  @Get('user/:userId')
+  @ApiOperation({ summary: 'Get contents by user ID' })
+  @ApiResponse({ status: 200, description: 'Return contents for user' })
+  async findByUserId(@Param('userId') userId: string) {
+    return this.contentManagementService.findByUserId(userId);
+  }
+
+  // ============================================
+  // GET SINGLE CONTENT
+  // ============================================
+  @Get(':id')
+  @ApiOperation({ summary: 'Get content by ID' })
+  @ApiResponse({ status: 200, description: 'Return content' })
+  @ApiResponse({ status: 404, description: 'Content not found' })
+  async findOne(@Param('id') id: string) {
+    return this.contentManagementService.findOne(id);
+  }
+
+  // ============================================
+  // UPDATE CONTENT
+  // ============================================
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update content' })
+  @ApiResponse({ status: 200, description: 'Content updated successfully' })
+  @ApiResponse({ status: 404, description: 'Content not found' })
+  async update(
+    @Param('id') id: string,
+    @Body() updateContentDto: UpdateContentDto,
+  ) {
+    return this.contentManagementService.update(id, updateContentDto);
+  }
+
+  // ============================================
+  // DELETE CONTENT
+  // ============================================
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete content' })
+  @ApiResponse({ status: 200, description: 'Content deleted successfully' })
+  @ApiResponse({ status: 404, description: 'Content not found' })
+  async remove(@Param('id') id: string) {
+    return this.contentManagementService.remove(id);
+  }
+
+  // ============================================
+  // ADDITIONAL FILTERED QUERIES
+  // ============================================
+  @Get('status/:status')
+  @ApiOperation({ summary: 'Get contents by status' })
+  @ApiResponse({ status: 200, description: 'Return contents by status' })
+  async findByStatus(@Param('status') status: string) {
+    return this.contentManagementService.findByStatus(status);
+  }
+
+  @Get('company/:companyId')
+  @ApiOperation({ summary: 'Get contents by company ID' })
+  @ApiResponse({ status: 200, description: 'Return contents for company' })
+  async findByCompany(@Param('companyId') companyId: string) {
+    return this.contentManagementService.findByCompany(companyId);
+  }
+
+  @Get('date-range')
+  @ApiOperation({ summary: 'Get contents by date range' })
+  @ApiQuery({ name: 'startDate', required: true, type: String })
+  @ApiQuery({ name: 'endDate', required: true, type: String })
+  @ApiResponse({ status: 200, description: 'Return contents in date range' })
+  async findByDateRange(
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+  ) {
+    return this.contentManagementService.findByDateRange(
+      new Date(startDate),
+      new Date(endDate),
+    );
+  }
+}

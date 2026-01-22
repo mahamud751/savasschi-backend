@@ -1,0 +1,123 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+
+@Injectable()
+export class ContentManagementService {
+  constructor(private prisma: PrismaService) {}
+
+  // ============================================
+  // CONTENT MANAGEMENT CRUD
+  // ============================================
+
+  async create(data: any) {
+    const {
+      userId,
+      companyId,
+      companyName,
+      date,
+      contentTitle,
+      occasion,
+      caption,
+      tags,
+      internalComments,
+      status = 'draft',
+    } = data;
+
+    return this.prisma.contentManagement.create({
+      data: {
+        userId,
+        companyId,
+        companyName,
+        date: new Date(date),
+        contentTitle,
+        occasion,
+        caption,
+        tags: Array.isArray(tags)
+          ? tags
+          : tags
+            ? tags.split(',').map((tag) => tag.trim())
+            : [],
+        internalComments,
+        status,
+      },
+    });
+  }
+
+  async findAll() {
+    return this.prisma.contentManagement.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async findByUserId(userId: string) {
+    return this.prisma.contentManagement.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async findOne(id: string) {
+    const content = await this.prisma.contentManagement.findUnique({
+      where: { id },
+    });
+
+    if (!content) {
+      throw new NotFoundException(`Content with ID ${id} not found`);
+    }
+
+    return content;
+  }
+
+  async update(id: string, data: any) {
+    // Handle date conversion if provided
+    if (data.date) {
+      data.date = new Date(data.date);
+    }
+
+    // Handle tags array conversion
+    if (data.tags && typeof data.tags === 'string') {
+      data.tags = data.tags.split(',').map((tag) => tag.trim());
+    }
+
+    return this.prisma.contentManagement.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async remove(id: string) {
+    return this.prisma.contentManagement.delete({
+      where: { id },
+    });
+  }
+
+  // ============================================
+  // ADDITIONAL QUERIES
+  // ============================================
+
+  async findByStatus(status: string) {
+    return this.prisma.contentManagement.findMany({
+      where: { status },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async findByCompany(companyId: string) {
+    return this.prisma.contentManagement.findMany({
+      where: { companyId },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async findByDateRange(startDate: Date, endDate: Date) {
+    return this.prisma.contentManagement.findMany({
+      where: {
+        date: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      orderBy: { date: 'asc' },
+    });
+  }
+}

@@ -44,6 +44,7 @@ import { BusinessModule } from './business/business.module';
 import { ClientBusinessModule } from './clientBusiness/client-business.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { LeaveModule } from './leave/leave.module';
+import { ContentManagementModule } from './content-management/content-management.module';
 
 @Module({
   providers: [SocketService],
@@ -92,6 +93,7 @@ import { LeaveModule } from './leave/leave.module';
     ClientBusinessModule,
     AttendanceModule,
     LeaveModule,
+    ContentManagementModule,
   ],
 })
 export class AppModule {}
