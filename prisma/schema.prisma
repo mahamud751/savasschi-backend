@@ -942,7 +942,8 @@ model TaskAssignment {
 // ============================================
 model ContentManagement {
   id              String     @id @default(uuid())
-  userId          String
+  userId          String     // Creator/Manager user ID
+  clientId        String     // The actual client user ID (who this content is for)
   companyId       String
   companyName     String
   date            DateTime

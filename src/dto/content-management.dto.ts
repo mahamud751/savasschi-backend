@@ -8,9 +8,16 @@ import {
 } from 'class-validator';
 
 export class CreateContentDto {
-  @ApiProperty({ required: true, description: 'User ID' })
+  @ApiProperty({ required: true, description: 'User ID (creator)' })
   @IsString()
   userId: string;
+
+  @ApiProperty({
+    required: true,
+    description: 'Client ID (who this content is for)',
+  })
+  @IsString()
+  clientId: string;
 
   @ApiProperty({ required: true, description: 'Company ID' })
   @IsString()
@@ -63,10 +70,18 @@ export class CreateContentDto {
 }
 
 export class UpdateContentDto {
-  @ApiProperty({ required: false, description: 'User ID' })
+  @ApiProperty({ required: false, description: 'User ID (creator)' })
   @IsString()
   @IsOptional()
   userId?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Client ID (who this content is for)',
+  })
+  @IsString()
+  @IsOptional()
+  clientId?: string;
 
   @ApiProperty({ required: false, description: 'Company ID' })
   @IsString()

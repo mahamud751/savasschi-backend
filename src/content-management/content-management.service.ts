@@ -12,6 +12,7 @@ export class ContentManagementService {
   async create(data: any) {
     const {
       userId,
+      clientId, // The client this content is for
       companyId,
       companyName,
       date,
@@ -25,7 +26,8 @@ export class ContentManagementService {
 
     return this.prisma.contentManagement.create({
       data: {
-        userId,
+        userId, // Creator/Manager ID
+        clientId, // Client ID (who this content is for)
         companyId,
         companyName,
         date: new Date(date),
@@ -118,6 +120,20 @@ export class ContentManagementService {
         },
       },
       orderBy: { date: 'asc' },
+    });
+  }
+
+  // ============================================
+  // CLIENT-WISE CONTENT FILTERING
+  // ============================================
+
+  async findByCompanyAndUser(companyId: string, clientId: string) {
+    return this.prisma.contentManagement.findMany({
+      where: {
+        companyId,
+        clientId, // Filter by client ID instead of user ID
+      },
+      orderBy: { createdAt: 'desc' },
     });
   }
 }

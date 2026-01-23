@@ -119,4 +119,24 @@ export class ContentManagementController {
       new Date(endDate),
     );
   }
+
+  // ============================================
+  // CLIENT-WISE CONTENT ENDPOINT
+  // ============================================
+  @Get('client/:companyId/client/:clientId')
+  @ApiOperation({ summary: 'Get contents by company ID and client ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return contents for specific company and client',
+  })
+  @ApiResponse({ status: 404, description: 'No contents found' })
+  async findByCompanyAndClient(
+    @Param('companyId') companyId: string,
+    @Param('clientId') clientId: string,
+  ) {
+    return this.contentManagementService.findByCompanyAndUser(
+      companyId,
+      clientId,
+    );
+  }
 }
