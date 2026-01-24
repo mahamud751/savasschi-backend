@@ -59,6 +59,12 @@ export class ClientBusinessController {
     return this.clientBusinessService.createOrUpdate(data);
   }
 
+  @Get('stats')
+  @ApiOperation({ summary: 'Get business statistics' })
+  async getStats() {
+    return this.clientBusinessService.getStats();
+  }
+
   @Get()
   @ApiOperation({ summary: 'Get all client businesses' })
   async findAll() {

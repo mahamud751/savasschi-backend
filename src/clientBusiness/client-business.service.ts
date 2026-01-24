@@ -33,11 +33,39 @@ export class ClientBusinessService {
   async findAll() {
     return this.prisma.clientBusiness.findMany({
       include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
         socialPosts: {
           orderBy: { createdAt: 'desc' },
         },
       },
     });
+  }
+
+  async getStats() {
+    const businesses = await this.prisma.clientBusiness.findMany({
+      select: {
+        industry: true,
+      },
+    });
+
+    const total = businesses.length;
+    const categories = new Set(
+      businesses
+        .map((b) => b.industry)
+        .filter((industry) => industry !== null && industry !== ''),
+    );
+
+    return {
+      totalBusiness: total,
+      totalCategories: categories.size,
+      categories: Array.from(categories),
+    };
   }
 
   async findByUserId(userId: string) {
