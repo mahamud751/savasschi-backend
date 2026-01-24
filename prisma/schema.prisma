@@ -961,7 +961,7 @@ model ContentManagement {
   inspareUrl      String[]   @default([]) // Array of inspare URLs
   inspareFiles    Json[]     @default([]) // Optional inspare files array
   reason          String?    // Optional reason
-  status          String     @default("pending") // pending, send, modified, approved, rejected, published
+  status          String     @default("pending") // pending, send, modified, approved, rejected, published, submit
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
   

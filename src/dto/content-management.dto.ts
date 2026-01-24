@@ -139,9 +139,25 @@ export class CreateContentDto {
   @ApiProperty({
     required: false,
     description: 'Content status',
-    enum: ['pending', 'send', 'modified', 'approved', 'rejected', 'published'],
+    enum: [
+      'pending',
+      'send',
+      'modified',
+      'approved',
+      'rejected',
+      'published',
+      'submit',
+    ],
   })
-  @IsEnum(['pending', 'send', 'modified', 'approved', 'rejected', 'published'])
+  @IsEnum([
+    'pending',
+    'send',
+    'modified',
+    'approved',
+    'rejected',
+    'published',
+    'submit',
+  ])
   @IsOptional()
   status?: string;
 }
@@ -284,9 +300,25 @@ export class UpdateContentDto {
   @ApiProperty({
     required: false,
     description: 'Content status',
-    enum: ['pending', 'send', 'modified', 'approved', 'rejected', 'published'],
+    enum: [
+      'pending',
+      'send',
+      'modified',
+      'approved',
+      'rejected',
+      'published',
+      'submit',
+    ],
   })
-  @IsEnum(['pending', 'send', 'modified', 'approved', 'rejected', 'published'])
+  @IsEnum([
+    'pending',
+    'send',
+    'modified',
+    'approved',
+    'rejected',
+    'published',
+    'submit',
+  ])
   @IsOptional()
   status?: string;
 }
