@@ -951,6 +951,7 @@ model ContentManagement {
   occasion        String?
   caption         String
   tags            String[]   @default([])
+  files           Json[]     @default([]) // Array of file metadata
   internalComments String?
   status          String     @default("draft") // draft, approved, rejected, published
   createdAt       DateTime   @default(now())

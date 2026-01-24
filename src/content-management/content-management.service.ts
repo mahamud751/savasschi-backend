@@ -20,6 +20,7 @@ export class ContentManagementService {
       occasion,
       caption,
       tags,
+      files,
       internalComments,
       status = 'draft',
     } = data;
@@ -39,6 +40,7 @@ export class ContentManagementService {
           : tags
             ? tags.split(',').map((tag) => tag.trim())
             : [],
+        files: files || [],
         internalComments,
         status,
       },
@@ -79,6 +81,11 @@ export class ContentManagementService {
     // Handle tags array conversion
     if (data.tags && typeof data.tags === 'string') {
       data.tags = data.tags.split(',').map((tag) => tag.trim());
+    }
+
+    // Handle files array - ensure it's an array
+    if (data.files !== undefined && !Array.isArray(data.files)) {
+      data.files = [];
     }
 
     return this.prisma.contentManagement.update({

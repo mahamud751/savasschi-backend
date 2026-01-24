@@ -54,6 +54,15 @@ export class CreateContentDto {
   @IsOptional()
   tags?: string[];
 
+  @ApiProperty({
+    required: false,
+    description: 'Files array (file metadata)',
+    type: [Object],
+  })
+  @IsArray()
+  @IsOptional()
+  files?: any[];
+
   @ApiProperty({ required: false, description: 'Internal comments' })
   @IsString()
   @IsOptional()
@@ -121,6 +130,15 @@ export class UpdateContentDto {
   @IsArray()
   @IsOptional()
   tags?: string[];
+
+  @ApiProperty({
+    required: false,
+    description: 'Files array (file metadata)',
+    type: [Object],
+  })
+  @IsArray()
+  @IsOptional()
+  files?: any[];
 
   @ApiProperty({ required: false, description: 'Internal comments' })
   @IsString()
