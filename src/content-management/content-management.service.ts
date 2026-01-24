@@ -46,7 +46,6 @@ export class ContentManagementService {
             : [],
         files: files || [],
         inspareFiles: inspareFiles || files || [], // Use inspareFiles or fallback to files
-        inspareUrl: Array.isArray(inspareUrl) ? inspareUrl : [],
         employeeComment,
         internalComments,
         role,
@@ -84,6 +83,11 @@ export class ContentManagementService {
     // Handle date conversion if provided
     if (data.date) {
       data.date = new Date(data.date);
+    }
+
+    // Handle dueDate conversion if provided
+    if (data.dueDate) {
+      data.dueDate = new Date(data.dueDate);
     }
 
     // Handle tags array conversion
