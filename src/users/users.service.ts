@@ -197,6 +197,7 @@ export class UsersService {
         branch: true,
         permissions: true,
         roleModel: true,
+        clientBusiness: true,
       },
     });
 
@@ -230,7 +231,9 @@ export class UsersService {
       role: user.role,
       roleId: user.roleId,
       employeeId: user.employeeId,
+
       branch: user.branch,
+      clientBusiness: user.clientBusiness,
       permissions: user.permissions.map((permission) => ({
         id: permission.id,
         name: permission.name,
