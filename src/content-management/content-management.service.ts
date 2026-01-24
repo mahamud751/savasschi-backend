@@ -23,6 +23,7 @@ export class ContentManagementService {
       files,
       employeeComment,
       internalComments,
+      role = 'pending',
       status = 'draft',
     } = data;
 
@@ -44,6 +45,7 @@ export class ContentManagementService {
         files: files || [],
         employeeComment,
         internalComments,
+        role,
         status,
       },
     });
@@ -109,6 +111,23 @@ export class ContentManagementService {
   async findByStatus(status: string) {
     return this.prisma.contentManagement.findMany({
       where: { status },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async findByRole(role: string) {
+    return this.prisma.contentManagement.findMany({
+      where: { role },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async findByRoleAndStatus(role: string, status: string) {
+    return this.prisma.contentManagement.findMany({
+      where: {
+        role,
+        status,
+      },
       orderBy: { createdAt: 'desc' },
     });
   }

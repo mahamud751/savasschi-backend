@@ -98,6 +98,26 @@ export class ContentManagementController {
     return this.contentManagementService.findByStatus(status);
   }
 
+  @Get('role/:role')
+  @ApiOperation({ summary: 'Get contents by role' })
+  @ApiResponse({ status: 200, description: 'Return contents by role' })
+  async findByRole(@Param('role') role: string) {
+    return this.contentManagementService.findByRole(role);
+  }
+
+  @Get('role/:role/status/:status')
+  @ApiOperation({ summary: 'Get contents by role and status' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return contents by role and status',
+  })
+  async findByRoleAndStatus(
+    @Param('role') role: string,
+    @Param('status') status: string,
+  ) {
+    return this.contentManagementService.findByRoleAndStatus(role, status);
+  }
+
   @Get('company/:companyId')
   @ApiOperation({ summary: 'Get contents by company ID' })
   @ApiResponse({ status: 200, description: 'Return contents for company' })

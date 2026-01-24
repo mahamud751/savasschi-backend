@@ -954,7 +954,7 @@ model ContentManagement {
   files           Json[]     @default([]) // Array of file metadata
   employeeComment String?    // Optional comment from employee
   internalComments String?
-  role            String?    // Optional role
+  role            String?    @default("pending") // Optional role
   assignId        String?    // Optional assign ID
   vision          String?    // Optional vision
   dueDate         DateTime?  // Optional due date

@@ -73,9 +73,10 @@ export class CreateContentDto {
 
   @ApiProperty({
     required: false,
-    description: 'Role (optional)',
+    description: 'Role assignment',
+    enum: ['designer', 'videographer', 'contentWriter', 'creator'],
   })
-  @IsString()
+  @IsEnum(['designer', 'videographer', 'contentWriter', 'creator'])
   @IsOptional()
   role?: string;
 
@@ -215,9 +216,10 @@ export class UpdateContentDto {
 
   @ApiProperty({
     required: false,
-    description: 'Role (optional)',
+    description: 'Role assignment',
+    enum: ['designer', 'videographer', 'contentWriter', 'creator'],
   })
-  @IsString()
+  @IsEnum(['designer', 'videographer', 'contentWriter', 'creator'])
   @IsOptional()
   role?: string;
 
