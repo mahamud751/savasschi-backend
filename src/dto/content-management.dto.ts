@@ -63,6 +63,71 @@ export class CreateContentDto {
   @IsOptional()
   files?: any[];
 
+  @ApiProperty({
+    required: false,
+    description: 'Employee comment (optional)',
+  })
+  @IsString()
+  @IsOptional()
+  employeeComment?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Role (optional)',
+  })
+  @IsString()
+  @IsOptional()
+  role?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Assign ID (optional)',
+  })
+  @IsString()
+  @IsOptional()
+  assignId?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Vision (optional)',
+  })
+  @IsString()
+  @IsOptional()
+  vision?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Due date (optional)',
+  })
+  @IsDateString()
+  @IsOptional()
+  dueDate?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Inspare URL (optional)',
+  })
+  @IsString()
+  @IsOptional()
+  inspareUrl?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Inspare files array (optional)',
+    type: [Object],
+  })
+  @IsArray()
+  @IsOptional()
+  inspareFiles?: any[];
+
+  @ApiProperty({
+    required: false,
+    description: 'Reason (optional)',
+  })
+  @IsString()
+  @IsOptional()
+  reason?: string;
+
   @ApiProperty({ required: false, description: 'Internal comments' })
   @IsString()
   @IsOptional()
@@ -71,9 +136,9 @@ export class CreateContentDto {
   @ApiProperty({
     required: false,
     description: 'Content status',
-    enum: ['draft', 'approved', 'rejected', 'published'],
+    enum: ['pending', 'send', 'modified', 'approved', 'rejected', 'published'],
   })
-  @IsEnum(['draft', 'approved', 'rejected', 'published'])
+  @IsEnum(['pending', 'send', 'modified', 'approved', 'rejected', 'published'])
   @IsOptional()
   status?: string;
 }
@@ -140,6 +205,71 @@ export class UpdateContentDto {
   @IsOptional()
   files?: any[];
 
+  @ApiProperty({
+    required: false,
+    description: 'Employee comment (optional)',
+  })
+  @IsString()
+  @IsOptional()
+  employeeComment?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Role (optional)',
+  })
+  @IsString()
+  @IsOptional()
+  role?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Assign ID (optional)',
+  })
+  @IsString()
+  @IsOptional()
+  assignId?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Vision (optional)',
+  })
+  @IsString()
+  @IsOptional()
+  vision?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Due date (optional)',
+  })
+  @IsDateString()
+  @IsOptional()
+  dueDate?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Inspare URL (optional)',
+  })
+  @IsString()
+  @IsOptional()
+  inspareUrl?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Inspare files array (optional)',
+    type: [Object],
+  })
+  @IsArray()
+  @IsOptional()
+  inspareFiles?: any[];
+
+  @ApiProperty({
+    required: false,
+    description: 'Reason (optional)',
+  })
+  @IsString()
+  @IsOptional()
+  reason?: string;
+
   @ApiProperty({ required: false, description: 'Internal comments' })
   @IsString()
   @IsOptional()
@@ -148,9 +278,9 @@ export class UpdateContentDto {
   @ApiProperty({
     required: false,
     description: 'Content status',
-    enum: ['draft', 'approved', 'rejected', 'published'],
+    enum: ['pending', 'send', 'modified', 'approved', 'rejected', 'published'],
   })
-  @IsEnum(['draft', 'approved', 'rejected', 'published'])
+  @IsEnum(['pending', 'send', 'modified', 'approved', 'rejected', 'published'])
   @IsOptional()
   status?: string;
 }

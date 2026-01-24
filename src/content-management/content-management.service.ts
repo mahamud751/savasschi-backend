@@ -21,6 +21,7 @@ export class ContentManagementService {
       caption,
       tags,
       files,
+      employeeComment,
       internalComments,
       status = 'draft',
     } = data;
@@ -41,6 +42,7 @@ export class ContentManagementService {
             ? tags.split(',').map((tag) => tag.trim())
             : [],
         files: files || [],
+        employeeComment,
         internalComments,
         status,
       },

@@ -952,8 +952,16 @@ model ContentManagement {
   caption         String
   tags            String[]   @default([])
   files           Json[]     @default([]) // Array of file metadata
+  employeeComment String?    // Optional comment from employee
   internalComments String?
-  status          String     @default("draft") // draft, approved, rejected, published
+  role            String?    // Optional role
+  assignId        String?    // Optional assign ID
+  vision          String?    // Optional vision
+  dueDate         DateTime?  // Optional due date
+  inspareUrl      String?    // Optional inspare URL
+  inspareFiles    Json[]     @default([]) // Optional inspare files array
+  reason          String?    // Optional reason
+  status          String     @default("pending") // pending, send, modified, approved, rejected, published
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
   
