@@ -106,11 +106,13 @@ export class CreateContentDto {
 
   @ApiProperty({
     required: false,
-    description: 'Inspare URL (optional)',
+    description: 'Inspare URLs array (optional)',
+    type: [String],
   })
-  @IsString()
+  @IsArray()
+  @IsString({ each: true })
   @IsOptional()
-  inspareUrl?: string;
+  inspareUrl?: string[];
 
   @ApiProperty({
     required: false,
@@ -249,11 +251,13 @@ export class UpdateContentDto {
 
   @ApiProperty({
     required: false,
-    description: 'Inspare URL (optional)',
+    description: 'Inspare URLs array (optional)',
+    type: [String],
   })
-  @IsString()
+  @IsArray()
+  @IsString({ each: true })
   @IsOptional()
-  inspareUrl?: string;
+  inspareUrl?: string[];
 
   @ApiProperty({
     required: false,

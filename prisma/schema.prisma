@@ -958,7 +958,7 @@ model ContentManagement {
   assignId        String?    // Optional assign ID
   vision          String?    // Optional vision
   dueDate         DateTime?  // Optional due date
-  inspareUrl      String?    // Optional inspare URL
+  inspareUrl      String[]   @default([]) // Array of inspare URLs
   inspareFiles    Json[]     @default([]) // Optional inspare files array
   reason          String?    // Optional reason
   status          String     @default("pending") // pending, send, modified, approved, rejected, published

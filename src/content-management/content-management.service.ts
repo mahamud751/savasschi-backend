@@ -21,6 +21,8 @@ export class ContentManagementService {
       caption,
       tags,
       files,
+      inspareFiles,
+      inspareUrl,
       employeeComment,
       internalComments,
       role = 'pending',
@@ -43,6 +45,8 @@ export class ContentManagementService {
             ? tags.split(',').map((tag) => tag.trim())
             : [],
         files: files || [],
+        inspareFiles: inspareFiles || files || [], // Use inspareFiles or fallback to files
+        inspareUrl: Array.isArray(inspareUrl) ? inspareUrl : [],
         employeeComment,
         internalComments,
         role,
@@ -90,6 +94,16 @@ export class ContentManagementService {
     // Handle files array - ensure it's an array
     if (data.files !== undefined && !Array.isArray(data.files)) {
       data.files = [];
+    }
+
+    // Handle inspareFiles array
+    if (data.inspareFiles !== undefined && !Array.isArray(data.inspareFiles)) {
+      data.inspareFiles = [];
+    }
+
+    // Handle inspareUrl array
+    if (data.inspareUrl !== undefined && !Array.isArray(data.inspareUrl)) {
+      data.inspareUrl = [];
     }
 
     return this.prisma.contentManagement.update({
