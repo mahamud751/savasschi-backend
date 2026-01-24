@@ -74,9 +74,9 @@ export class CreateContentDto {
   @ApiProperty({
     required: false,
     description: 'Role assignment',
-    enum: ['designer', 'videographer', 'contentWriter', 'creator'],
+    enum: ['pending', 'designer', 'videographer', 'contentWriter', 'creator'],
   })
-  @IsEnum(['designer', 'videographer', 'contentWriter', 'creator'])
+  @IsEnum(['pending', 'designer', 'videographer', 'contentWriter', 'creator'])
   @IsOptional()
   role?: string;
 
@@ -217,9 +217,9 @@ export class UpdateContentDto {
   @ApiProperty({
     required: false,
     description: 'Role assignment',
-    enum: ['designer', 'videographer', 'contentWriter', 'creator'],
+    enum: ['pending', 'designer', 'videographer', 'contentWriter', 'creator'],
   })
-  @IsEnum(['designer', 'videographer', 'contentWriter', 'creator'])
+  @IsEnum(['pending', 'designer', 'videographer', 'contentWriter', 'creator'])
   @IsOptional()
   role?: string;
 
