@@ -159,4 +159,18 @@ export class ContentManagementController {
       clientId,
     );
   }
+
+  // ============================================
+  // EMPLOYEE ASSIGNED CONTENT ENDPOINT
+  // ============================================
+  @Get('assigned/:assignId')
+  @ApiOperation({ summary: 'Get contents assigned to employee' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return contents assigned to specific employee',
+  })
+  @ApiResponse({ status: 404, description: 'No contents found' })
+  async findByAssignId(@Param('assignId') assignId: string) {
+    return this.contentManagementService.findByAssignId(assignId);
+  }
 }

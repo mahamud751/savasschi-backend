@@ -182,4 +182,17 @@ export class ContentManagementService {
       orderBy: { createdAt: 'desc' },
     });
   }
+
+  // ============================================
+  // EMPLOYEE ASSIGNED CONTENT
+  // ============================================
+
+  async findByAssignId(assignId: string) {
+    return this.prisma.contentManagement.findMany({
+      where: {
+        assignId,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
 }
