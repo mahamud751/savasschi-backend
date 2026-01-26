@@ -34,6 +34,9 @@ export class NotificationService {
     perPage: number = 10,
     email?: string,
     status?: string,
+    clientId?: string,
+    assignId?: string,
+    userId?: string,
   ): Promise<{ data: any[]; total: number }> {
     const pageNumber = Number(page) || 1;
     const perPageNumber = perPage ? Number(perPage) : null;
@@ -50,6 +53,18 @@ export class NotificationService {
 
     if (status) {
       where.status = status;
+    }
+
+    if (clientId) {
+      where.clientId = clientId;
+    }
+
+    if (assignId) {
+      where.assignId = assignId;
+    }
+
+    if (userId) {
+      where.userId = userId;
     }
 
     const totalCountPromise = this.prisma.notification.count({

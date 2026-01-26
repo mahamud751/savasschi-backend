@@ -40,8 +40,19 @@ export class NotificationController {
     @Query('perPage') perPage: number = 10,
     @Query('email') email?: string,
     @Query('status') status?: string,
+    @Query('clientId') clientId?: string,
+    @Query('assignId') assignId?: string,
+    @Query('userId') userId?: string,
   ) {
-    return this.notificationService.findAll(page, perPage, email, status);
+    return this.notificationService.findAll(
+      page,
+      perPage,
+      email,
+      status,
+      clientId,
+      assignId,
+      userId,
+    );
   }
 
   @Get(':id')
