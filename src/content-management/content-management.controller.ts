@@ -7,13 +7,24 @@ import {
   Param,
   Delete,
   Query,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiQuery,
+  ApiConsumes,
+  ApiBody,
+} from '@nestjs/swagger';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { ContentManagementService } from './content-management.service';
 import {
   CreateContentDto,
   UpdateContentDto,
 } from '../dto/content-management.dto';
+import { multerOptions } from '../../middleware/multer.config';
 
 @ApiTags('content-management')
 @Controller('content-management')
@@ -21,6 +32,44 @@ export class ContentManagementController {
   constructor(
     private readonly contentManagementService: ContentManagementService,
   ) {}
+
+  // ============================================
+  // FILE UPLOAD
+  // ============================================
+  @Post('upload-files')
+  @UseInterceptors(FilesInterceptor('files', 10, multerOptions))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Upload content files' })
+  @ApiBody({
+    description: 'Upload multiple files',
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Files uploaded successfully',
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
+  async uploadFiles(@UploadedFiles() files: Express.Multer.File[]): Promise<{
+    files: Array<{ filename: string; url: string }>;
+  }> {
+    const uploadedFiles = files.map((file) => ({
+      filename: file.filename,
+      url: `/uploads/${file.filename}`,
+    }));
+
+    return { files: uploadedFiles };
+  }
 
   // ============================================
   // CREATE CONTENT
