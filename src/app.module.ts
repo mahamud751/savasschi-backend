@@ -46,6 +46,7 @@ import { AttendanceModule } from './attendance/attendance.module';
 import { LeaveModule } from './leave/leave.module';
 import { ContentManagementModule } from './content-management/content-management.module';
 import { TaskAssignmentModule } from './task-assignment/task-assignment.module';
+import { ScheduledContentModule } from './scheduled-content/scheduled-content.module';
 
 @Module({
   providers: [SocketService],
@@ -96,6 +97,7 @@ import { TaskAssignmentModule } from './task-assignment/task-assignment.module';
     LeaveModule,
     ContentManagementModule,
     TaskAssignmentModule,
+    ScheduledContentModule,
   ],
 })
 export class AppModule implements NestModule {
