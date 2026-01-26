@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UsersModule } from './users/users.module';
@@ -98,4 +98,15 @@ import { TaskAssignmentModule } from './task-assignment/task-assignment.module';
     TaskAssignmentModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply((req, res, next) => {
+        console.log(
+          `[Incoming Request] ${req.method} ${req.originalUrl || req.url}`,
+        );
+        next();
+      })
+      .forRoutes('*');
+  }
+}

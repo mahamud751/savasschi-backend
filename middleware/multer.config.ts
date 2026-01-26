@@ -1,6 +1,7 @@
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
+import { BadRequestException } from '@nestjs/common';
 
 // Define the Multer options
 export const multerOptions: MulterOptions = {
@@ -18,7 +19,7 @@ export const multerOptions: MulterOptions = {
     if (supportedFiles.test(extname(file.originalname))) {
       cb(null, true); // Accept the file
     } else {
-      cb(new Error('Invalid file type'), false); // Reject the file
+      cb(new BadRequestException('Invalid file type. Supported types: jpg, jpeg, png, pdf, docx, xlsx, xls, doc, mp4, mov, avi, zip, rar'), false); // Reject the file
     }
   },
   limits: {
