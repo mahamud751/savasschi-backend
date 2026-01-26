@@ -140,7 +140,7 @@ export class ContentManagementService {
       type: 'content_updated',
       contentId: updatedContent.id,
       companyId: updatedContent.companyId,
-      clientId: updatedContent.clientId, // User/Client
+      clientId: updatedContent.clientId, // Set recipient as the client
       assignId: updatedContent.assignId, // Employee
     });
 
