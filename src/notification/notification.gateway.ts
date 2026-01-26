@@ -80,6 +80,12 @@ export class NotificationGateway
         .emit('notification', notification);
     }
 
+    if (notification.clientId) {
+      this.server
+        .to(`user:${notification.clientId}`)
+        .emit('notification', notification);
+    }
+
     if (notification.userEmail) {
       // If we only have email, we might need to join users to email rooms too
       this.server
@@ -104,6 +110,7 @@ export class NotificationGateway
     // Broad emission if no target specified (or keep it targeted)
     if (
       !notification.userId &&
+      !notification.clientId &&
       !notification.companyId &&
       !notification.assignId &&
       !notification.userEmail

@@ -39,12 +39,14 @@ export class NotificationService {
     const perPageNumber = perPage ? Number(perPage) : null;
     const skip = (pageNumber - 1) * (perPageNumber || 0);
 
-    const where: any = {
-      userEmail: {
+    const where: any = {};
+
+    if (email) {
+      where.userEmail = {
         contains: email,
         mode: 'insensitive',
-      },
-    };
+      };
+    }
 
     if (status) {
       where.status = status;
@@ -74,6 +76,30 @@ export class NotificationService {
   async getNotificationsForUserByEmail(email: string) {
     return this.prisma.notification.findMany({
       where: { userEmail: email },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async getNotificationsByUserId(userId: string) {
+    return this.prisma.notification.findMany({
+      where: {
+        OR: [{ userId: userId }, { clientId: userId }],
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async getNotificationsByCompanyId(companyId: string) {
+    return this.prisma.notification.findMany({
+      where: { companyId },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async getNotificationsByAssignId(assignId: string) {
+    return this.prisma.notification.findMany({
+      where: { assignId },
+      orderBy: { createdAt: 'desc' },
     });
   }
 

@@ -67,6 +67,7 @@ export class ContentManagementService {
       companyId: companyId,
       clientId: clientId, // User/Client
       assignId: assignId, // Employee
+      userId: userId,
     });
 
     return content;

@@ -65,6 +65,42 @@ export class NotificationController {
     return this.notificationService.getNotificationsForUserByEmail(email);
   }
 
+  @Get('recipient/:userId')
+  @ApiOperation({
+    summary: 'Get all notifications for a specific user or client by ID',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of notifications for the user/client by ID.',
+  })
+  async getNotificationsByUserId(@Param('userId') userId: string) {
+    return this.notificationService.getNotificationsByUserId(userId);
+  }
+
+  @Get('company/:companyId')
+  @ApiOperation({
+    summary: 'Get all notifications for a specific company',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of notifications for the company.',
+  })
+  async getNotificationsByCompanyId(@Param('companyId') companyId: string) {
+    return this.notificationService.getNotificationsByCompanyId(companyId);
+  }
+
+  @Get('assigned/:assignId')
+  @ApiOperation({
+    summary: 'Get all notifications for a specific employee by assignId',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of notifications for the employee.',
+  })
+  async getNotificationsByAssignId(@Param('assignId') assignId: string) {
+    return this.notificationService.getNotificationsByAssignId(assignId);
+  }
+
   @Patch(':id')
   @ApiOperation({ summary: 'Update notification status (read/unread)' })
   @ApiResponse({
