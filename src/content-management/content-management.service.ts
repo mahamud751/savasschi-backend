@@ -1,9 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class ContentManagementService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationService: NotificationService,
+  ) {}
 
   // ============================================
   // CONTENT MANAGEMENT CRUD
@@ -27,9 +31,10 @@ export class ContentManagementService {
       internalComments,
       role = 'pending',
       status = 'draft',
+      assignId,
     } = data;
 
-    return this.prisma.contentManagement.create({
+    const content = await this.prisma.contentManagement.create({
       data: {
         userId, // Creator/Manager ID
         clientId, // Client ID (who this content is for)
@@ -50,8 +55,21 @@ export class ContentManagementService {
         internalComments,
         role,
         status,
+        assignId,
       },
     });
+
+    // Send Notifications
+    await this.notificationService.createNotification({
+      message: `New content created: ${contentTitle || 'Untitled'}`,
+      type: 'content_created',
+      contentId: content.id,
+      companyId: companyId,
+      clientId: clientId, // User/Client
+      assignId: assignId, // Employee
+    });
+
+    return content;
   }
 
   async findAll() {
@@ -110,10 +128,22 @@ export class ContentManagementService {
       data.inspareUrl = [];
     }
 
-    return this.prisma.contentManagement.update({
+    const updatedContent = await this.prisma.contentManagement.update({
       where: { id },
       data,
     });
+
+    // Send Notifications
+    await this.notificationService.createNotification({
+      message: `Content updated: ${updatedContent.contentTitle || 'Untitled'}`,
+      type: 'content_updated',
+      contentId: updatedContent.id,
+      companyId: updatedContent.companyId,
+      clientId: updatedContent.clientId, // User/Client
+      assignId: updatedContent.assignId, // Employee
+    });
+
+    return updatedContent;
   }
 
   async remove(id: string) {

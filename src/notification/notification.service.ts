@@ -20,13 +20,8 @@ export class NotificationService {
   ) {}
 
   async createNotification(createNotificationDto: CreateNotificationDto) {
-    const { userEmail, message, ...rest } = createNotificationDto;
     const notification = await this.prisma.notification.create({
-      data: {
-        userEmail,
-        message,
-        ...rest,
-      },
+      data: createNotificationDto,
     });
 
     this.notificationGateway.emitNotification(notification);

@@ -456,14 +456,19 @@ model OrderNote {
 }
 
 model Notification {
-  id        String   @id @default(uuid())
-  userEmail String
-  message   String
-  status    String   @default("unread")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  orderId   String
-  order     Order    @relation(fields: [orderId], references: [id])
+  id          String   @id @default(uuid())
+  userEmail   String?
+  userId      String?
+  companyId   String?
+  assignId    String?
+  message     String
+  type        String   @default("general") // e.g., "order", "content"
+  status      String   @default("unread")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  orderId     String?
+  contentId   String?
+  order       Order?    @relation(fields: [orderId], references: [id])
 }
 
 model Role {

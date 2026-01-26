@@ -8,23 +8,63 @@ import {
 } from 'class-validator';
 
 export class CreateNotificationDto {
-  @ApiProperty({ description: 'ID of the order related to the notification' })
-  @IsNotEmpty()
+  @ApiPropertyOptional({
+    description: 'ID of the order related to the notification',
+  })
   @IsString()
-  orderId: string;
+  @IsOptional()
+  orderId?: string;
 
-  @ApiProperty({ description: 'Email of the user to send notification' })
+  @ApiPropertyOptional({
+    description: 'ID of the content related to the notification',
+  })
+  @IsString()
+  @IsOptional()
+  contentId?: string;
+
+  @ApiPropertyOptional({
+    description: 'Email of the user to send notification',
+  })
   @IsEmail()
-  @IsNotEmpty()
-  userEmail: string;
+  @IsOptional()
+  userEmail?: string;
+
+  @ApiPropertyOptional({ description: 'User ID of the recipient' })
+  @IsString()
+  @IsOptional()
+  userId?: string;
+
+  @ApiPropertyOptional({ description: 'Client ID of the recipient' })
+  @IsString()
+  @IsOptional()
+  clientId?: string;
+
+  @ApiPropertyOptional({
+    description: 'Company ID for client-wise notifications',
+  })
+  @IsString()
+  @IsOptional()
+  companyId?: string;
+
+  @ApiPropertyOptional({
+    description: 'Assign ID for employee-wise notifications',
+  })
+  @IsString()
+  @IsOptional()
+  assignId?: string;
 
   @ApiProperty({ description: 'Custom message for the notification' })
   @IsString()
+  @IsNotEmpty()
+  message: string;
+
+  @ApiPropertyOptional({ description: 'Type of notification' })
+  @IsString()
   @IsOptional()
-  message?: string;
+  type?: string;
 
   @ApiPropertyOptional({
-    description: 'Status of the demo',
+    description: 'Status of the notification',
     enum: ['read', 'unread'],
   })
   @IsEnum(['read', 'unread'])
