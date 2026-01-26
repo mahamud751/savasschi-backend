@@ -37,7 +37,7 @@ export class ContentManagementController {
   // FILE UPLOAD
   // ============================================
   @Post('upload-files')
-  @UseInterceptors(FilesInterceptor('files', 10, multerOptions))
+  @UseInterceptors(FilesInterceptor('files', 50, multerOptions))
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Upload content files' })
   @ApiBody({

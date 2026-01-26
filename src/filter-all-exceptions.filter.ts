@@ -26,6 +26,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
         message =
           (errorResponse as any).message || JSON.stringify(errorResponse);
       }
+      
+      // Log HTTP exceptions as well for debugging
+      console.error(`HTTP Exception (${status}):`, JSON.stringify({
+        message,
+        path: request.url,
+        method: request.method,
+        body: request.body,
+        query: request.query
+      }, null, 2));
     } else {
       console.error('Unhandled exception:', exception);
     }

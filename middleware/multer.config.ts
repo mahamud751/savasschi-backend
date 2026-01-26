@@ -14,7 +14,7 @@ export const multerOptions: MulterOptions = {
     },
   }),
   fileFilter: (req, file, cb) => {
-    const supportedFiles = /\.(jpg|jpeg|png|pdf|docx)$/i;
+    const supportedFiles = /\.(jpg|jpeg|png|pdf|docx|xlsx|xls|doc|mp4|mov|avi|zip|rar)$/i;
     if (supportedFiles.test(extname(file.originalname))) {
       cb(null, true); // Accept the file
     } else {
@@ -22,6 +22,6 @@ export const multerOptions: MulterOptions = {
     }
   },
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10 MB size limit
+    fileSize: 50 * 1024 * 1024, // 50 MB size limit
   },
 };
