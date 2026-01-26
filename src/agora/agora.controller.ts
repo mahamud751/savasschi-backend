@@ -258,4 +258,20 @@ export class AgoraController {
       );
     }
   }
+
+  /**
+   * Broadcast meeting link to all users or specific group
+   * POST /agora/broadcast-meeting
+   */
+  @Post('broadcast-meeting')
+  async broadcastMeeting(@Body() data: any) {
+    try {
+      return await this.agoraService.broadcastMeeting(data);
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Failed to broadcast meeting',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }

@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, forwardRef, Inject } from '@nestjs/common';
 import {
   RtcTokenBuilder,
   RtmTokenBuilder,
   RtcRole,
   RtmRole,
 } from 'agora-access-token';
+import { NotificationService } from '../notification/notification.service';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const {
@@ -18,6 +19,11 @@ export class AgoraService {
   private readonly appId = process.env.AGORA_APP_ID || 'YOUR_AGORA_APP_ID';
   private readonly appCertificate =
     process.env.AGORA_APP_CERTIFICATE || 'YOUR_AGORA_APP_CERTIFICATE';
+
+  constructor(
+    @Inject(forwardRef(() => NotificationService))
+    private readonly notificationService: NotificationService,
+  ) {}
 
   /**
    * Generate RTC Token for Video/Audio calls
@@ -122,14 +128,42 @@ export class AgoraService {
     rtcToken: { token: string; appId: string };
     rtmToken: { token: string; appId: string };
   } {
+    const rtcToken = this.generateRTCToken(
+      channelName,
+      uid,
+      RtcRole.PUBLISHER,
+      expirationTimeInSeconds,
+    );
+    const rtmToken = this.generateRTMToken(userId, expirationTimeInSeconds);
+
     return {
-      rtcToken: this.generateRTCToken(
-        channelName,
-        uid,
-        RtcRole.PUBLISHER,
-        expirationTimeInSeconds,
-      ),
-      rtmToken: this.generateRTMToken(userId, expirationTimeInSeconds),
+      rtcToken,
+      rtmToken,
     };
+  }
+
+  /**
+   * Broadcast meeting link to all users or specific group
+   */
+  async broadcastMeeting(data: {
+    channelName: string;
+    title: string;
+    creatorName: string;
+    meetingLink: string;
+    companyId?: string;
+  }) {
+    try {
+      await this.notificationService.createNotification({
+        message: `${data.creatorName} started a new meeting: ${data.title}. Click to join.`,
+        type: 'meeting_started',
+        companyId: data.companyId,
+        contentId: data.channelName, // Reuse contentId for channelName
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error broadcasting meeting:', error);
+      throw error;
+    }
   }
 }
