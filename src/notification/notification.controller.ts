@@ -18,7 +18,7 @@ import {
 import { AdminRoleGuard } from 'src/auth/AdminRoleGuard';
 
 @ApiTags('Notifications')
-@Controller('notifications')
+@Controller('notification')
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
