@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { AddMemberDto } from './dto/add-member.dto';
+import { AddMembersDto } from './dto/add-members.dto';
 import { SendGroupMessageDto } from './dto/send-message.dto';
 
 @Injectable()
@@ -265,5 +266,93 @@ export class ChatGroupService {
     );
 
     return groupsWithLastMessage;
+  }
+
+  async addMembersBulk(addMembersDto: AddMembersDto) {
+    const { groupId, members } = addMembersDto;
+    
+    // Validate that groupId is provided
+    if (!groupId) {
+      throw new Error('groupId is required');
+    }
+
+    // First, check which users are already members to avoid duplicates
+    const existingMembers = await this.prisma.groupMember.findMany({
+      where: {
+        groupId,
+        userId: {
+          in: members.map(m => m.userId)
+        }
+      },
+      select: {
+        userId: true
+      }
+    });
+
+    const existingUserIds = new Set(existingMembers.map(m => m.userId));
+    
+    // Filter out users who are already members
+    const newMembers = members.filter(member => !existingUserIds.has(member.userId));
+    
+    if (newMembers.length === 0) {
+      // All users are already members
+      const currentMembers = await this.prisma.groupMember.findMany({
+        where: { groupId },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              photos: true,
+            },
+          },
+        },
+      });
+      return currentMembers;
+    }
+
+    // Create new members in a transaction
+    const memberCreates = newMembers.map(member => ({
+      groupId,
+      userId: member.userId,
+      role: member.role || 'member',
+    }));
+
+    const createdMembers = await this.prisma.$transaction(
+      memberCreates.map(memberData => 
+        this.prisma.groupMember.create({
+          data: memberData,
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                photos: true,
+              },
+            },
+            group: true,
+          },
+        })
+      )
+    );
+
+    // Return all current members (existing + newly created)
+    const allMembers = await this.prisma.groupMember.findMany({
+      where: { groupId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            photos: true,
+          },
+        },
+      },
+    });
+
+    return allMembers;
   }
 }

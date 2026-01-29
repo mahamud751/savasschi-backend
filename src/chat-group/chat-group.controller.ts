@@ -10,6 +10,7 @@ import {
 import { ChatGroupService } from './chat-group.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { AddMemberDto } from './dto/add-member.dto';
+import { AddMembersDto } from './dto/add-members.dto';
 import { SendGroupMessageDto } from './dto/send-message.dto';
 
 @Controller('chat-groups')
@@ -37,6 +38,16 @@ export class ChatGroupController {
   @Post(':id/members')
   addMember(@Body() addMemberDto: AddMemberDto) {
     return this.chatGroupService.addMember(addMemberDto);
+  }
+
+  @Post(':id/members/bulk')
+  addMembers(@Param('id') groupId: string, @Body() addMembersDto: AddMembersDto) {
+    // Add groupId from URL parameter to the DTO
+    const fullDto = {
+      ...addMembersDto,
+      groupId
+    };
+    return this.chatGroupService.addMembersBulk(fullDto);
   }
 
   @Delete(':id/members/:userId')
