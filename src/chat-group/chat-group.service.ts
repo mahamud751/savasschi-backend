@@ -46,48 +46,6 @@ export class ChatGroupService {
     });
   }
 
-  async getGroupsForUser(userId: string) {
-    return this.prisma.chatGroup.findMany({
-      where: {
-        members: {
-          some: {
-            userId: userId,
-          },
-        },
-      },
-      include: {
-        members: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-                photos: true,
-              },
-            },
-          },
-        },
-        creator: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        _count: {
-          select: {
-            members: true,
-            messages: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-  }
-
   async getGroupById(groupId: string) {
     return this.prisma.chatGroup.findUnique({
       where: { id: groupId },
@@ -265,5 +223,87 @@ export class ChatGroupService {
     );
 
     return groupsWithLastMessage;
+  }
+
+  // NEW: Get all groups for admin users
+  async getAllGroups() {
+    const groups = await this.prisma.chatGroup.findMany({
+      include: {
+        members: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                photos: true,
+              },
+            },
+          },
+        },
+        _count: {
+          select: {
+            messages: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    // Add last message for each group
+    const groupsWithLastMessage = await Promise.all(
+      groups.map(async (group) => {
+        const lastMessage = await this.prisma.groupMessage.findFirst({
+          where: { groupId: group.id },
+          include: {
+            sender: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        });
+
+        return {
+          ...group,
+          lastMessage,
+        };
+      }),
+    );
+
+    return groupsWithLastMessage;
+  }
+
+  // NEW: Get groups for user with admin check
+  async getGroupsForUser(userId: string) {
+    // First, get the user to check if they're admin
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // If user is admin or superAdmin, return all groups
+    if (user.role === 'admin' || user.role === 'superAdmin') {
+      console.log(
+        `[ChatGroupService] Admin user ${userId} - returning all groups`,
+      );
+      return this.getAllGroups();
+    }
+
+    // Otherwise, return only groups where user is a member
+    console.log(
+      `[ChatGroupService] Regular user ${userId} - returning member groups`,
+    );
+    return this.getUserGroups(userId);
   }
 }
