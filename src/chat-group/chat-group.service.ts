@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { AddMemberDto } from './dto/add-member.dto';
-import { AddMembersDto } from './dto/add-members.dto';
 import { SendGroupMessageDto } from './dto/send-message.dto';
 
 @Injectable()
@@ -43,48 +42,6 @@ export class ChatGroupService {
             email: true,
           },
         },
-      },
-    });
-  }
-
-  async getGroupsForUser(userId: string) {
-    return this.prisma.chatGroup.findMany({
-      where: {
-        members: {
-          some: {
-            userId: userId,
-          },
-        },
-      },
-      include: {
-        members: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-                photos: true,
-              },
-            },
-          },
-        },
-        creator: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        _count: {
-          select: {
-            members: true,
-            messages: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
       },
     });
   }
@@ -268,61 +225,11 @@ export class ChatGroupService {
     return groupsWithLastMessage;
   }
 
-  async addMembersBulk(addMembersDto: AddMembersDto) {
-    const { groupId, members } = addMembersDto;
-    
-    // Validate that groupId is provided
-    if (!groupId) {
-      throw new Error('groupId is required');
-    }
-
-    // First, check which users are already members to avoid duplicates
-    const existingMembers = await this.prisma.groupMember.findMany({
-      where: {
-        groupId,
-        userId: {
-          in: members.map(m => m.userId)
-        }
-      },
-      select: {
-        userId: true
-      }
-    });
-
-    const existingUserIds = new Set(existingMembers.map(m => m.userId));
-    
-    // Filter out users who are already members
-    const newMembers = members.filter(member => !existingUserIds.has(member.userId));
-    
-    if (newMembers.length === 0) {
-      // All users are already members
-      const currentMembers = await this.prisma.groupMember.findMany({
-        where: { groupId },
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              photos: true,
-            },
-          },
-        },
-      });
-      return currentMembers;
-    }
-
-    // Create new members in a transaction
-    const memberCreates = newMembers.map(member => ({
-      groupId,
-      userId: member.userId,
-      role: member.role || 'member',
-    }));
-
-    const createdMembers = await this.prisma.$transaction(
-      memberCreates.map(memberData => 
-        this.prisma.groupMember.create({
-          data: memberData,
+  // NEW: Get all groups for admin users
+  async getAllGroups() {
+    const groups = await this.prisma.chatGroup.findMany({
+      include: {
+        members: {
           include: {
             user: {
               select: {
@@ -332,27 +239,71 @@ export class ChatGroupService {
                 photos: true,
               },
             },
-            group: true,
           },
-        })
-      )
-    );
-
-    // Return all current members (existing + newly created)
-    const allMembers = await this.prisma.groupMember.findMany({
-      where: { groupId },
-      include: {
-        user: {
+        },
+        _count: {
           select: {
-            id: true,
-            name: true,
-            email: true,
-            photos: true,
+            messages: true,
           },
         },
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
 
-    return allMembers;
+    // Add last message for each group
+    const groupsWithLastMessage = await Promise.all(
+      groups.map(async (group) => {
+        const lastMessage = await this.prisma.groupMessage.findFirst({
+          where: { groupId: group.id },
+          include: {
+            sender: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        });
+
+        return {
+          ...group,
+          lastMessage,
+        };
+      }),
+    );
+
+    return groupsWithLastMessage;
+  }
+
+  // NEW: Get groups for user with admin check
+  async getGroupsForUser(userId: string) {
+    // First, get the user to check if they're admin
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // If user is admin or superAdmin, return all groups
+    if (user.role === 'admin' || user.role === 'superAdmin') {
+      console.log(
+        `[ChatGroupService] Admin user ${userId} - returning all groups`,
+      );
+      return this.getAllGroups();
+    }
+
+    // Otherwise, return only groups where user is a member
+    console.log(
+      `[ChatGroupService] Regular user ${userId} - returning member groups`,
+    );
+    return this.getUserGroups(userId);
   }
 }
