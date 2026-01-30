@@ -136,16 +136,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     try {
       // Store group message in database (always, for history)
-      // Note: This will work after Prisma migration is run
-      // await this.prisma.groupMessage.create({
-      //   data: {
-      //     groupId: data.groupId,
-      //     senderId: data.from,
-      //     content: data.message,
-      //     type: data.type || 'text',
-      //     createdAt: new Date(data.timestamp),
-      //   },
-      // });
+      await this.prisma.groupMessage.create({
+        data: {
+          groupId: data.groupId,
+          senderId: data.from,
+          content: data.message,
+          type: data.type || 'text',
+          createdAt: new Date(data.timestamp),
+        },
+      });
 
       // Broadcast to all group members
       this.server.to(`group:${data.groupId}`).emit('group_message', {
@@ -156,11 +155,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         timestamp: data.timestamp,
       });
 
-      this.logger.log(`Group message broadcasted to group ${data.groupId}`);
+      this.logger.log(
+        `Group message saved to database and broadcasted to group ${data.groupId}`,
+      );
       return { success: true, stored: true };
     } catch (error) {
       this.logger.error('Error handling group message:', error);
-      return { success: false, error: 'Failed to send group message' };
+      // Even if database save fails, still broadcast the message
+      this.server.to(`group:${data.groupId}`).emit('group_message', {
+        groupId: data.groupId,
+        from: data.from,
+        message: data.message,
+        type: data.type || 'text',
+        timestamp: data.timestamp,
+      });
+      return {
+        success: true,
+        stored: false,
+        error: 'Message broadcasted but not saved to database',
+      };
     }
   }
 
