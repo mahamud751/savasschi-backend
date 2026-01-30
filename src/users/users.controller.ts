@@ -144,8 +144,9 @@ export class UsersController {
     @Query('email') email?: string,
     @Query('page') page: number = 1,
     @Query('perPage') perPage: number = 10,
+    @Query('getAll') getAll: boolean = false,
   ) {
-    return this.usersService.getUsers(role, email, page, perPage);
+    return this.usersService.getUsers(role, email, page, perPage, getAll);
   }
 
   @Get('admin')

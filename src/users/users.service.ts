@@ -372,7 +372,27 @@ export class UsersService {
     email?: string,
     page: number = 1,
     perPage: number = 25,
+    getAll: boolean = false, // Add getAll parameter
   ): Promise<{ data: any[]; total: number }> {
+    // If getAll is true, bypass pagination and return all users
+    if (getAll) {
+      const data = await this.prisma.user.findMany({
+        where: {
+          ...(role && { role }),
+          ...(email && { email: { contains: email, mode: 'insensitive' } }),
+        },
+        orderBy: { createdAt: 'desc' },
+        include: {
+          advances: true,
+          permissions: true,
+          department: true,
+          category: true,
+        },
+      });
+
+      return { data, total: data.length };
+    }
+
     const pageNumber = Number(page) || 1;
     const perPageNumber = Number(perPage) || 10;
     const skip = (pageNumber - 1) * perPageNumber;
