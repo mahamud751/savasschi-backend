@@ -25,9 +25,10 @@ export class ChatGroupController {
   @Get()
   findAll(@Query('userId') userId: string) {
     if (userId) {
-      return this.chatGroupService.getUserGroups(userId);
+      return this.chatGroupService.getGroupsForUser(userId);
     }
-    return this.chatGroupService.getGroupsForUser(userId);
+    // If no userId provided, return empty array or handle appropriately
+    return [];
   }
 
   @Get(':id')
