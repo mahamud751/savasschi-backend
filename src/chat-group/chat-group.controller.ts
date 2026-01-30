@@ -42,13 +42,25 @@ export class ChatGroupController {
   }
 
   @Post(':id/members/bulk')
-  addMembers(@Param('id') groupId: string, @Body() addMembersDto: AddMembersDto) {
+  addMembers(
+    @Param('id') groupId: string,
+    @Body() addMembersDto: AddMembersDto,
+  ) {
     // Add groupId from URL parameter to the DTO
     const fullDto = {
       ...addMembersDto,
-      groupId
+      groupId,
     };
     return this.chatGroupService.addMembersBulk(fullDto);
+  }
+
+  @Post(':id/members/add')
+  addMembersToGroup(
+    @Param('id') groupId: string,
+    @Body('userIds') userIds: string[],
+    @Body('role') role?: string,
+  ) {
+    return this.chatGroupService.addMembersToGroup(groupId, userIds, role);
   }
 
   @Delete(':id/members/:userId')

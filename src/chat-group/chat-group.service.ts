@@ -113,6 +113,101 @@ export class ChatGroupService {
     });
   }
 
+  // NEW METHOD: Add multiple members to an existing group
+  async addMembersToGroup(
+    groupId: string,
+    userIds: string[],
+    role: string = 'member',
+  ) {
+    // Check if group exists
+    const group = await this.prisma.chatGroup.findUnique({
+      where: { id: groupId },
+    });
+
+    if (!group) {
+      throw new Error('Group not found');
+    }
+
+    // Check which users are already members to avoid duplicates
+    const existingMembers = await this.prisma.groupMember.findMany({
+      where: {
+        groupId,
+        userId: {
+          in: userIds,
+        },
+      },
+      select: {
+        userId: true,
+      },
+    });
+
+    const existingUserIds = new Set(existingMembers.map((m) => m.userId));
+
+    // Filter out users who are already members
+    const newUsers = userIds.filter((userId) => !existingUserIds.has(userId));
+
+    if (newUsers.length === 0) {
+      // All users are already members, return current members
+      const currentMembers = await this.prisma.groupMember.findMany({
+        where: { groupId },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              photos: true,
+            },
+          },
+        },
+      });
+      return currentMembers;
+    }
+
+    // Create new members in a transaction
+    const memberCreates = newUsers.map((userId) => ({
+      groupId,
+      userId,
+      role: role || 'member',
+    }));
+
+    const createdMembers = await this.prisma.$transaction(
+      memberCreates.map((memberData) =>
+        this.prisma.groupMember.create({
+          data: memberData,
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                photos: true,
+              },
+            },
+            group: true,
+          },
+        }),
+      ),
+    );
+
+    // Return all current members (existing + newly created)
+    const allMembers = await this.prisma.groupMember.findMany({
+      where: { groupId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            photos: true,
+          },
+        },
+      },
+    });
+
+    return allMembers;
+  }
+
   async removeMember(groupId: string, userId: string) {
     return this.prisma.groupMember.delete({
       where: {
@@ -310,7 +405,7 @@ export class ChatGroupService {
 
   async addMembersBulk(addMembersDto: AddMembersDto) {
     const { groupId, members } = addMembersDto;
-    
+
     // Validate that groupId is provided
     if (!groupId) {
       throw new Error('groupId is required');
@@ -321,19 +416,21 @@ export class ChatGroupService {
       where: {
         groupId,
         userId: {
-          in: members.map(m => m.userId)
-        }
+          in: members.map((m) => m.userId),
+        },
       },
       select: {
-        userId: true
-      }
+        userId: true,
+      },
     });
 
-    const existingUserIds = new Set(existingMembers.map(m => m.userId));
-    
+    const existingUserIds = new Set(existingMembers.map((m) => m.userId));
+
     // Filter out users who are already members
-    const newMembers = members.filter(member => !existingUserIds.has(member.userId));
-    
+    const newMembers = members.filter(
+      (member) => !existingUserIds.has(member.userId),
+    );
+
     if (newMembers.length === 0) {
       // All users are already members
       const currentMembers = await this.prisma.groupMember.findMany({
@@ -353,14 +450,14 @@ export class ChatGroupService {
     }
 
     // Create new members in a transaction
-    const memberCreates = newMembers.map(member => ({
+    const memberCreates = newMembers.map((member) => ({
       groupId,
       userId: member.userId,
       role: member.role || 'member',
     }));
 
     const createdMembers = await this.prisma.$transaction(
-      memberCreates.map(memberData => 
+      memberCreates.map((memberData) =>
         this.prisma.groupMember.create({
           data: memberData,
           include: {
@@ -374,8 +471,8 @@ export class ChatGroupService {
             },
             group: true,
           },
-        })
-      )
+        }),
+      ),
     );
 
     // Return all current members (existing + newly created)
