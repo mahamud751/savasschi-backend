@@ -34,6 +34,11 @@ export class ChatFileController {
   async uploadFiles(@UploadedFiles() files: Express.Multer.File[]): Promise<{
     files: Array<{ filename: string; url: string; type: string }>;
   }> {
+    // Handle case where no files are uploaded (all rejected by filter)
+    if (!files || files.length === 0) {
+      return { files: [] };
+    }
+
     const uploadedFiles = files.map((file) => {
       // Determine file type based on extension
       const extension = file.originalname.split('.').pop()?.toLowerCase();
