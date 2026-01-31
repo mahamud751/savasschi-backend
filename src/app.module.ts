@@ -40,6 +40,7 @@ import { CompanyCategoryModule } from './companyCategory/company-category.module
 import { AgoraModule } from './agora/agora.module';
 import { ChatModule } from './chat/chat.module';
 import { ChatGroupModule } from './chat-group/chat-group.module';
+import { ChatFileModule } from './chat-file/chat-file.module';
 import { ProjectModule } from './project/project.module';
 import { BusinessModule } from './business/business.module';
 import { ClientBusinessModule } from './clientBusiness/client-business.module';
@@ -91,6 +92,7 @@ import { ScheduledContentModule } from './scheduled-content/scheduled-content.mo
     AgoraModule,
     ChatModule,
     ChatGroupModule,
+    ChatFileModule,
     MessagesModule,
     ProjectModule,
     BusinessModule,

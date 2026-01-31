@@ -62,7 +62,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('send_message')
   async handleMessage(
     @MessageBody()
-    data: { to: string; message: string; from: string; timestamp: number },
+    data: {
+      to: string;
+      message: string;
+      from: string;
+      timestamp: number;
+      attachments?: string[];
+    },
     @ConnectedSocket() client: Socket,
   ) {
     this.logger.log(`Message from ${data.from} to ${data.to}: ${data.message}`);
@@ -74,6 +80,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           senderId: data.from.toString(),
           receiverId: data.to.toString(),
           content: data.message,
+          attachments: data.attachments ? (data.attachments as any) : [],
           createdAt: new Date(data.timestamp),
         },
       });
@@ -127,6 +134,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       from: string;
       timestamp: number;
       type: string;
+      attachments?: string[];
     },
     @ConnectedSocket() client: Socket,
   ) {
@@ -142,6 +150,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           senderId: data.from,
           content: data.message,
           type: data.type || 'text',
+          attachments: data.attachments ? (data.attachments as any) : [],
           createdAt: new Date(data.timestamp),
         },
       });
@@ -152,6 +161,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         from: data.from,
         message: data.message,
         type: data.type || 'text',
+        attachments: data.attachments || [],
         timestamp: data.timestamp,
       });
 
@@ -167,6 +177,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         from: data.from,
         message: data.message,
         type: data.type || 'text',
+        attachments: data.attachments || [],
         timestamp: data.timestamp,
       });
       return {

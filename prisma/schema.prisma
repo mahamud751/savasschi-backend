@@ -544,6 +544,7 @@ model Message {
   senderId   String
   receiverId String?
   content    String
+  attachments Json[]   @default([])
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
@@ -573,15 +574,16 @@ model GroupMember {
 }
 
 model GroupMessage {
-  id        String    @id @default(uuid())
-  groupId   String
-  senderId  String
-  content   String
-  type      String    @default("text") // text, image, file
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  group     ChatGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  sender    User      @relation("UserGroupMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  id         String    @id @default(uuid())
+  groupId    String
+  senderId   String
+  content    String
+  type       String    @default("text") // text, image, file
+  attachments Json[]   @default([])
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  group      ChatGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  sender     User      @relation("UserGroupMessages", fields: [senderId], references: [id], onDelete: Cascade)
 }
 
 model Dynamic {
